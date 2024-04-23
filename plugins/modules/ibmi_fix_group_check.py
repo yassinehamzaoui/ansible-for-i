@@ -40,7 +40,7 @@ options:
     description:
       - Timeout in seconds for URL request.
     type: int
-    default: 10
+    default: 60
     required: false
 
 notes:
@@ -103,7 +103,7 @@ import datetime
 import re
 
 
-__ibmi_module_version__ = "2.0.1"
+__ibmi_module_version__ = "2.0.2"
 
 PSP_URL = "https://www.ibm.com/support/pages/sites/default/files/inline-files/xmldoc.xml"
 ALL_GROUP_PAGE = "https://www.ibm.com/support/pages/ibm-i-group-ptfs-level"
@@ -113,13 +113,15 @@ HTTP_AGENT = "ansible/ibm.power_ibmi"
 # url: https://www.ibm.com/support/pages/ibm-i-group-ptfs-level
 # group: 'SF99738'
 def get_group_info_from_web(groups, validate_certs, timeout):
+    # PTF information can span multiple lines on latest all group page
     pattern_link = re.compile(
         r'>(?P<rel>R\d{3})<.+?'
         r'(?P<url>https:\/\/\S+?)\".+?>'
         r'(?P<grp>[A-Z]{2}\d{5}):.+?'
         r'(?P<dsc>\w.+?)<.+?'
         r'(?P<lvl>\d{1,5})<.+?>'
-        r'(?P<d>\d{2}\/\d{2}\/\d{4})<'
+        r'(?P<d>\d{2}\/\d{2}\/\d{4})<',
+        re.DOTALL
     )
     response = ''
     try:
@@ -130,25 +132,23 @@ def get_group_info_from_web(groups, validate_certs, timeout):
                 error=str(e),
                 )]
     r = response.read().decode("utf-8")
-    lines = r.splitlines()
     group_list = []
     groups = list(set([x.upper() for x in groups]))
     list_all = False
     if '*ALL' in groups:
         list_all = True
-    for line in lines:
-        for ptf_line in re.finditer(pattern_link, line):
-            if list_all or ptf_line.group('grp') in groups:
-                group_list.append(dict(
-                    ptf_group_number=ptf_line.group('grp'),
-                    ptf_group_level=int(ptf_line.group('lvl')),
-                    release=ptf_line.group('rel'),
-                    release_date=ptf_line.group('d'),
-                    url=ptf_line.group('url'),
-                    description=ptf_line.group('dsc'),
-                    ptf_list=get_ptf_list_from_web(
-                        ptf_line.group('url'), validate_certs, timeout),
-                ))
+    for ptf_str in re.finditer(pattern_link, r):
+        if list_all or ptf_str.group('grp') in groups:
+            group_list.append(dict(
+                ptf_group_number=ptf_str.group('grp'),
+                ptf_group_level=int(ptf_str.group('lvl')),
+                release=ptf_str.group('rel'),
+                release_date=ptf_str.group('d'),
+                url=ptf_str.group('url'),
+                description=ptf_str.group('dsc'),
+                ptf_list=get_ptf_list_from_web(
+                    ptf_str.group('url'), validate_certs, timeout),
+            ))
     return group_list
 
 
@@ -226,7 +226,7 @@ def main():
         argument_spec=dict(
             groups=dict(type='list', elements='str', default=['*ALL']),
             validate_certs=dict(type='bool', default=True),
-            timeout=dict(type='int', default=10)
+            timeout=dict(type='int', default=60)
         ),
         supports_check_mode=True,
     )

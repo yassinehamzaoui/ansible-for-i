@@ -163,7 +163,7 @@ import re
 import json
 
 
-__ibmi_module_version__ = "2.0.1"
+__ibmi_module_version__ = "2.0.2"
 
 images = []
 ptf_repo_lv1_table = 'ptf_repo_lv1_info'
@@ -198,7 +198,7 @@ def get_checksum_in_txt(sha256_file):
     if not os.path.isfile(sha256_file):
         return None
 
-    chksum_pattern = r'^\((?P<file>\S+)\)\=\s*(?P<chksum>[a-z0-9]{64})$'
+    chksum_pattern = r'\S*\((?P<file>\S+)\)\=\s*(?P<chksum>[a-z0-9]{64})$'
     chksum_info_all = []
     lines = []
 

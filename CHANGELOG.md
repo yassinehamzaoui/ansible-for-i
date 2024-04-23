@@ -1,6 +1,25 @@
 # Change Log
 
-## v2.0.1 (2023-03-05)
+## v2.0.2 (2024-04-24)
+
+This release primarily addresses the fix check breakage from the recent PSP web site updates.
+
+### Bug Fixes
+
+- Fix for github issue 191: <https://github.com/IBM/ansible-for-i/issues/191>
+  - Revise parsing of PSP group PTF web page for recent change that broke the fix check modules.
+  - Future work is needed to properly account for individual PTF dependencies with new web page format
+    along with other lower level information.
+
+- Fix for github issue 194: <https://github.com/IBM/ansible-for-i/issues/194>
+  - Increase timeout for fix check modules from 10 to 60 seconds to account for increased PSP web page access time
+    that was causing false failures in roles that depend on fix check.
+
+- Fix the level 1 fix management module ibmi_fix_repo_lv1
+  - Revise parsing of sha256 file that is used for checksums when generating a new database fix entry for a refresh action.
+    The file format has changed slightly and we were erroneously skipping valid fixes that were using the new format.
+
+## v2.0.1 (2024-03-05)
 
 This release includes a number of fixes along with code clean-up to continue the Redhat certification of the collection.
 
