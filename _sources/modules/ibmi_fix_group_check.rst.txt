@@ -46,7 +46,7 @@ timeout
 
   | **required**: False
   | **type**: int
-  | **default**: 10
+  | **default**: 60
 
 
      
