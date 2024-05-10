@@ -1,15 +1,60 @@
 ---
 # Role for load_apply_ptfs
+
+- name: Initialize return variables
+  ansible.builtin.set_fact:
+    load_apply_ptfs_load_success_list: []
+    load_apply_ptfs_load_fail_list: []
+    load_apply_ptfs_load_fail_dict: {}
+    load_apply_ptfs_apply_fail_with_requisite_list: []
+    load_apply_ptfs_apply_fail_dict: {}
+    load_apply_ptfs_requisite_list: []
+    load_apply_ptfs_apply_success_list: []
+    load_apply_ptfs_apply_fail_list: []
+
+- name: Set whether there are ptfs to load
+  ansible.builtin.set_fact:
+    load_apply_ptfs_are_ptfs_to_load: "{{ load_apply_ptfs_to_be_loaded_ptf_list | default([]) != [] }}"
+
 - name: Include load_ptf role to load PTFs
   ansible.builtin.include_role:
     name: load_ptf
   vars:
-    to_be_loaded_list: "{{ to_be_loaded_ptf_list }}"
-  when: to_be_loaded_ptf_list | default([]) != []
+    load_ptf_to_be_loaded_list: "{{ load_apply_ptfs_to_be_loaded_ptf_list }}"
+    load_ptf_remote_lib: "{{ load_apply_ptfs_remote_lib }}"
+  when: load_apply_ptfs_are_ptfs_to_load
+
+- name: Set return vars when load_ptf role invoked
+  ansible.builtin.set_fact:
+    load_apply_ptfs_load_success_list: "{{ load_ptf_load_success_list }}"
+    load_apply_ptfs_load_fail_list: "{{ load_ptf_load_fail_list  }}"
+    load_apply_ptfs_load_fail_dict: "{{  load_ptf_load_fail_dict }}"
+  when: load_apply_ptfs_are_ptfs_to_load
+
+- name: Set whether there are ptfs to apply (some loaded)
+  ansible.builtin.set_fact:
+    load_apply_ptfs_are_ptfs_to_apply: "{{ load_apply_ptfs_load_success_list | default([]) + load_apply_ptfs_loaded_list != [] }}"
 
 - name: Include apply_ptf role to apply PTFs
   ansible.builtin.include_role:
     name: apply_ptf
   vars:
-    to_be_applied_list: "{{ load_success_list | default([]) + loaded_list }}"
-  when: load_success_list | default([]) + loaded_list != []
+    apply_ptf_to_be_applied_list: "{{ load_apply_ptfs_load_success_list | default([]) + load_apply_ptfs_loaded_list }}"
+    apply_ptf_apply_all_loaded_ptfs: "{{  load_apply_ptfs_apply_all_loaded_ptf }}"
+    apply_ptf_temp_or_perm: "{{ load_apply_ptfs_temp_or_perm }}"
+    apply_ptf_delayed_option: "{{ load_apply_ptfs_delayed_option  }}"
+    apply_ptf_auto_ipl: "{{  load_apply_ptfs_auto_ipl }}"
+  when: load_apply_ptfs_are_ptfs_to_apply
+
+- name: Set return vars when apply_ptf role invoked
+  ansible.builtin.set_fact:
+    load_apply_ptfs_apply_fail_with_requisite_list: "{{ apply_ptf_apply_fail_with_requisite_list }}"
+    load_apply_ptfs_apply_fail_dict: "{{ apply_ptf_apply_fail_dict }}"
+    load_apply_ptfs_requisite_list: "{{ apply_ptf_requisite_list }}"
+  when: load_apply_ptfs_are_ptfs_to_apply
+
+- name: Set return vars when apply_ptf role invoked and not option for applying all loaded ptfs
+  ansible.builtin.set_fact:
+    load_apply_ptfs_apply_success_list: "{{ apply_ptf_apply_success_list }}"
+    load_apply_ptfs_apply_fail_list: "{{ apply_ptf_apply_fail_list }}"
+  when: load_apply_ptfs_are_ptfs_to_apply and not load_apply_ptfs_apply_all_loaded_ptf

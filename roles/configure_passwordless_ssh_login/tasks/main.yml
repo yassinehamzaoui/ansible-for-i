@@ -3,14 +3,14 @@
 # Tasks file for configure_passwordless_ssh_login
 - name: Install ssh key
   ansible.posix.authorized_key:
-    user: '{{ target_user }}'
-    key: "{{  public_key }}"
+    user: '{{ configure_passwordless_ssh_login_target_user }}'
+    key: "{{  configure_passwordless_ssh_login_public_key }}"
     state: present
 
 - name: Find the home directory
   ibm.power_ibmi.ibmi_user_and_group:
     operation: 'display'
-    user: '{{ target_user }}'
+    user: '{{ configure_passwordless_ssh_login_target_user }}'
   register: user_result
 
 - name: Compose home_dir
@@ -22,18 +22,18 @@
     path: '{{ home_dir }}'
     state: directory
     mode: '0700'
-    owner: '{{ target_user }}'
+    owner: '{{ configure_passwordless_ssh_login_target_user }}'
 
 - name: The authority of .ssh directory has to be 0700
   ansible.builtin.file:
     path: '{{ home_dir }}/.ssh'
     state: directory
     mode: '0700'
-    owner: '{{ target_user }}'
+    owner: '{{ configure_passwordless_ssh_login_target_user }}'
 
 - name: The authority of authorized_keys has to be 0600
   ansible.builtin.file:
     path: '{{ home_dir }}/.ssh/authorized_keys'
     state: file
     mode: '0600'
-    owner: '{{ target_user }}'
+    owner: '{{ configure_passwordless_ssh_login_target_user }}'

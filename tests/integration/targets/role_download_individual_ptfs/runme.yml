@@ -8,6 +8,15 @@
     - set_fact: 
         ptfs: ['SI73990', 'SI73107']
 
+    - name: Add download server VM to Ansible in-memory inventory
+      add_host:
+        name: 'ut2026p8.rch.stglabs.ibm.com'
+        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_user: tester
+        groups: ibmi
+        ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+        ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
     - include: cleanup.yml
       delegate_to: "ut2026p8.rch.stglabs.ibm.com"
 
@@ -15,21 +24,23 @@
       include_role:
         name: download_individual_ptfs
       vars:
-        to_be_downloaded_list:
+        download_individual_ptfs_to_be_downloaded_list:
           - {'ptf_id': "{{ptfs[0]}}"}
           - {'ptf_id': "{{ptfs[1]}}"}
-        order: '*PTFID'
-        download_server: "ut2026p8.rch.stglabs.ibm.com"
+        download_individual_ptfs_order: '*PTFID'
+        download_individual_ptfs_download_server: "ut2026p8.rch.stglabs.ibm.com"
 
     - name: assert values
       assert:
         that:
-          - download_success_list | length == 2
-          - download_fail_list | length == 0
-          - download_success_list[0]['ptf_id'] == "{{ptfs[0]}}"
-          - download_success_list[1]['ptf_id'] == "{{ptfs[1]}}"
-          - download_success_list[0]['release'] != ""
-          - download_success_list[1]['release'] != ""
+          - download_individual_ptfs_download_success_list is defined
+          - download_individual_ptfs_download_fail_list is defined
+          - download_individual_ptfs_download_success_list | length == 2
+          - download_individual_ptfs_download_fail_list | length == 0
+          - download_individual_ptfs_download_success_list[0]['ptf_id'] == "{{ptfs[0]}}"
+          - download_individual_ptfs_download_success_list[1]['ptf_id'] == "{{ptfs[1]}}"
+          - download_individual_ptfs_download_success_list[0]['release'] != ""
+          - download_individual_ptfs_download_success_list[1]['release'] != ""
         
     - name: negative test
       include: neg_case.yml      

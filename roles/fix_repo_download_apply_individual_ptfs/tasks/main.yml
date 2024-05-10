@@ -7,10 +7,11 @@
 
 - name: Compose all_ptfs_list and original_ptfs_list
   ansible.builtin.set_fact:
-    all_ptfs_list: "{{ ptfs_list_parm }}"
-    original_ptfs_list: "{{ ptfs_list_parm }}"
+    all_ptfs_list: "{{ fix_repo_download_apply_individual_ptfs_ptfs_list_parm }}"
+    original_ptfs_list: "{{ fix_repo_download_apply_individual_ptfs_ptfs_list_parm }}"
   when: sequence_var|int == 1
 
+# Follow-up: requisite_list is not defined prior, so always default empty list here
 - name: Compose all_ptfs_list and all_requisite_ptfs_list
   ansible.builtin.set_fact:
     all_ptfs_list: "{{ all_ptfs_list + requisite_list | default([]) }}"
@@ -19,32 +20,35 @@
 - name: Include fix_repo_check_download_individual_ptfs role to check and download a list of individual ptfs
   ansible.builtin.include_role:
     name: fix_repo_check_download_individual_ptfs
+  vars:
+    fix_repo_check_download_individual_ptfs_ptfs_list_parm: "{{ fix_repo_download_apply_individual_ptfs_ptfs_list_parm }}"
+    fix_repo_check_download_individual_ptfs_repo_server: "{{ fix_repo_download_apply_individual_ptfs_repo_server }}"
 
 - name: Compose final_ptfs_status add find fail list
   ansible.builtin.set_fact:
     final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ fail_list_var.ptf_id: fail_list_var.db_record }) }}"
-  loop: "{{ final_find_result.fail_list }}"
+  loop: "{{ fix_repo_check_download_individual_ptfs_final_find_result.fail_list }}"
   loop_control:
     loop_var: fail_list_var
-  when: final_find_result.fail_list is defined
+  when: fix_repo_check_download_individual_ptfs_final_find_result.fail_list is defined
 
 - name: Compose final_ptfs_status add download fail list
   ansible.builtin.set_fact:
     final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ download_fail_list_var.ptf_id: 'DOWNLOAD_FAIL' }) }}"
-  loop: "{{ download_fail_list }}"
+  loop: "{{ fix_repo_check_download_individual_ptfs_download_fail_list }}"
   loop_control:
     loop_var: download_fail_list_var
-  when: download_fail_list != []
+  when: fix_repo_check_download_individual_ptfs_download_fail_list != []
 
 - name: Include check_ptf role to determine which ptfs need to apply
   ansible.builtin.include_role:
     name: check_ptf
   vars:
-    check_ptf_list: "{{ final_find_result.success_list }}"
-  when: final_find_result.success_list is defined
+    check_ptf_list: "{{ fix_repo_check_download_individual_ptfs_final_find_result.success_list }}"
+  when: fix_repo_check_download_individual_ptfs_final_find_result.success_list is defined
 
 - name: Check for failure
-  when: final_find_result.success_list is not defined
+  when: fix_repo_check_download_individual_ptfs_final_find_result.success_list is not defined
   block:
     - name: Print final_ptfs_status
       ansible.builtin.debug:
@@ -57,59 +61,64 @@
 - name: Compose final_ptfs_status download fail list
   ansible.builtin.set_fact:
     final_ptfs_status: "{{ final_ptfs_status | default({}) | combine({ product_not_installed_ptfs_var.ptf_id: 'PRODUCT_NOT_INSTALLED' }) }}"
-  loop: "{{ product_not_installed_ptfs }}"
+  loop: "{{ check_ptf_product_not_installed_ptfs }}"
   loop_control:
     loop_var: product_not_installed_ptfs_var
-  when: product_not_installed_ptfs != []
+  when: check_ptf_product_not_installed_ptfs != []
 
 - name: Compose tmp_not_loaded_ptfs_list and tmp_loaded_ptfs_list
   ansible.builtin.set_fact:
-    tmp_not_loaded_ptfs_list: "{{ not_loaded_ptfs_list }}"
-    tmp_loaded_ptfs_list: "{{ loaded_ptfs_list }}"
+    tmp_not_loaded_ptfs_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+    tmp_loaded_ptfs_list: "{{ check_ptf_loaded_ptfs_list }}"
 
 - name: Load and apply PTFs
-  when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != [] or temporarily_applied_list != []
+  when: tmp_not_loaded_ptfs_list != [] or tmp_loaded_ptfs_list != [] or check_ptf_temporarily_applied_list != []
   block:
     - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
       ansible.builtin.include_role:
         name: sync_apply_individual_ptfs
       vars:
-        not_loaded_list: "{{ not_loaded_ptfs_list }}"
-        src_host: "{{ repo_server }}"
-        already_loaded_list: "{{ loaded_ptfs_list }}"
-      when: temp_or_perm != '*PERM'
+        # Set temp_or_perm
+        sync_apply_individual_ptfs_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_src_host: "{{ fix_repo_download_apply_individual_ptfs_repo_server }}"
+        sync_apply_individual_ptfs_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_temp_or_perm: "{{ fix_repo_download_apply_individual_ptfs_temp_or_perm }}"
+
+      when: fix_repo_download_apply_individual_ptfs_temp_or_perm != '*PERM'
 
     - name: Include role and then load and apply
-      when: temp_or_perm == '*PERM'
+      when: fix_repo_download_apply_individual_ptfs_temp_or_perm == '*PERM'
       block:
         - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply when temp_or_perm == '*PERM'
           ansible.builtin.include_role:
             name: sync_apply_individual_ptfs
           vars:
-            not_loaded_list: "{{ not_loaded_ptfs_list + temporarily_applied_list }}"
-            src_host: "{{ repo_server }}"
-            already_loaded_list: "{{ loaded_ptfs_list }}"
-          when: not_loaded_ptfs_list != [] or loaded_ptfs_list != []
+            # Set temp_or_perm
+            sync_apply_individual_ptfs_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list + check_ptf_temporarily_applied_list }}"
+            sync_apply_individual_ptfs_src_host: "{{ fix_repo_download_apply_individual_ptfs_repo_server }}"
+            sync_apply_individual_ptfs_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+            sync_apply_individual_ptfs_temp_or_perm: "{{ fix_repo_download_apply_individual_ptfs_temp_or_perm }}"
+          when: check_ptf_not_loaded_ptfs_list != [] or check_ptf_loaded_ptfs_list != []
 
         - name: Call ibmi_cl_command to install the temporarily applied PTFs
           ibm.power_ibmi.ibmi_cl_command:
             cmd: "APYPTF LICPGM({{ temporarily_applied_list_parm.product }}) SELECT({{ temporarily_applied_list_parm.ptf_id }}) APY(*PERM)"
-          loop: "{{ temporarily_applied_list }}"
+          loop: "{{ check_ptf_temporarily_applied_list }}"
           loop_control:
             loop_var: temporarily_applied_list_parm
-          when: not_loaded_ptfs_list == [] and loaded_ptfs_list == [] and temporarily_applied_list != []
+          when: check_ptf_not_loaded_ptfs_list == [] and check_ptf_loaded_ptfs_list == [] and check_ptf_temporarily_applied_list != []
 
     - name: Compose final_ptfs_status load fail list
       ansible.builtin.set_fact:
-        final_ptfs_status: "{{ final_ptfs_status | default({}) | combine( load_fail_dict | default({})) }}"
+        final_ptfs_status: "{{ final_ptfs_status | default({}) | combine( sync_apply_individual_ptfs_load_fail_dict | default({})) }}"
 
     - name: Compose load_fail_simple_list
       ansible.builtin.set_fact:
         load_fail_simple_list: "{{ load_fail_simple_list | default([]) + [ load_fail_list_var.ptf_id ] }}"
-      loop: "{{ load_fail_list }}"
+      loop: "{{ sync_apply_individual_ptfs_load_fail_list }}"
       loop_control:
         loop_var: load_fail_list_var
-      when: load_fail_list | default([]) != []
+      when: sync_apply_individual_ptfs_load_fail_list | default([]) != []
 
     # - name: Print load_fail_simple_list
     #   ansible.builtin.debug:
@@ -118,14 +127,14 @@
     - name: Compose next_not_loaded_ptfs_list
       ansible.builtin.set_fact:
         next_not_loaded_ptfs_list: "{{ next_not_loaded_ptfs_list | default([]) + [not_loaded_ptfs_list_var.ptf_id] }}"
-      loop: "{{ not_loaded_ptfs_list }}"
+      loop: "{{ check_ptf_not_loaded_ptfs_list }}"
       loop_control:
         loop_var: not_loaded_ptfs_list_var
 
     - name: Compose next_loaded_ptfs_list
       ansible.builtin.set_fact:
         next_loaded_ptfs_list: "{{ next_loaded_ptfs_list | default([]) + [loaded_ptfs_list_var.ptf_id] }}"
-      loop: "{{ loaded_ptfs_list }}"
+      loop: "{{ check_ptf_loaded_ptfs_list }}"
       loop_control:
         loop_var: loaded_ptfs_list_var
 
@@ -136,6 +145,10 @@
     # - name: Print next_loaded_ptfs_list
     #   ansible.builtin.debug:
     #     var: next_loaded_ptfs_list
+
+    - name: Compose the requisite_list from sync_apply_individual_ptfs
+      ansible.builtin.set_fact:
+        requisite_list: "{{ sync_apply_individual_ptfs_requisite_list }}"
 
     # - name: Print requisite_list
     #   ansible.builtin.debug:
@@ -148,7 +161,7 @@
     - name: Compose the new ptfs_list
       ansible.builtin.set_fact:
         ptfs_list_parm: "{{ ( next_not_loaded_ptfs_list | default([]) + next_loaded_ptfs_list |
-        default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
+          default([]) + requisite_list | default([]) ) | difference( load_fail_simple_list | default([])) }}"
 
     # - name: Print ptfs_list_parm
     #   ansible.builtin.debug:
@@ -174,42 +187,43 @@
         name: check_ptf
       vars:
         check_ptf_list: "{{ all_ptfs }}"
-        check_product: false
+        check_ptf_check_product: false
 
     # - name: Print ptfs status
     #   ansible.builtin.debug:
-    #     var: ptfs_status
+    #     var: check_ptf_ptfs_status
 
     - name: Compose final_ptfs_status_with_requisite add final check_ptf output
       ansible.builtin.set_fact:
-        final_ptfs_status_with_requisite: "{{ ptfs_status | default({}) | combine( final_ptfs_status ) }}"
+        fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite: "{{ check_ptf_ptfs_status | default({}) | combine( final_ptfs_status ) }}"
 
     - name: Compose final_ptfs_status_with_requisite add sync fail list
       ansible.builtin.set_fact:
-        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) | combine( { sync_fail_list_var.ptf_id: 'SYNC_FAIL' }) }}"
-      loop: "{{ sync_fail_list }}"
+        fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite: "{{ fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite |
+          default({}) | combine( { sync_fail_list_var.ptf_id: 'SYNC_FAIL' }) }}"
+      loop: "{{ sync_apply_individual_ptfs_sync_fail_list }}"
       loop_control:
         loop_var: sync_fail_list_var
-      when: sync_fail_list | default([]) != []
+      when: sync_apply_individual_ptfs_sync_fail_list | default([]) != []
 
     - name: Compose final_ptfs_status_with_requisite add apply fail list
       ansible.builtin.set_fact:
-        final_ptfs_status_with_requisite: "{{ final_ptfs_status_with_requisite | default({}) |
-        combine(apply_fail_dict) }}"
-      when: apply_fail_dict | default({}) != {}
+        fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite: "{{ fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite |
+          default({}) | combine(sync_apply_individual_ptfs_apply_fail_dict) }}"
+      when: sync_apply_individual_ptfs_apply_fail_dict | default({}) != {}
 
     - name: Compose original_ptfs_status
       ansible.builtin.set_fact:
-        original_ptfs_status: "{{ original_ptfs_status | default({}) |
-        combine( { original_ptfs_list_var: final_ptfs_status_with_requisite[original_ptfs_list_var] }) }}"
+        fix_repo_download_apply_individual_ptfs_original_ptfs_status: "{{ fix_repo_download_apply_individual_ptfs_original_ptfs_status | default({}) |
+          combine( { original_ptfs_list_var: fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite[original_ptfs_list_var] }) }}"
       loop: "{{ original_ptfs_list }}"
       loop_control:
         loop_var: original_ptfs_list_var
 
     - name: Compose requisite_ptfs_status
       ansible.builtin.set_fact:
-        requisite_ptfs_status: "{{ requisite_ptfs_status | default({}) |
-        combine({ all_requisite_ptfs_list_var: final_ptfs_status_with_requisite[all_requisite_ptfs_list_var] }) }}"
+        fix_repo_download_apply_individual_ptfs_requisite_ptfs_status: "{{ fix_repo_download_apply_individual_ptfs_requisite_ptfs_status | default({}) |
+          combine({ all_requisite_ptfs_list_var: fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite[all_requisite_ptfs_list_var] }) }}"
       loop: "{{ all_requisite_ptfs_list }}"
       loop_control:
         loop_var: all_requisite_ptfs_list_var
@@ -220,16 +234,16 @@
 
     - name: Print final ptfs status
       ansible.builtin.debug:
-        var: final_ptfs_status_with_requisite
+        var: fix_repo_download_apply_individual_ptfs_final_ptfs_status_with_requisite
 
     - name: Print original ptfs status
       ansible.builtin.debug:
-        var: original_ptfs_status
+        var: fix_repo_download_apply_individual_ptfs_original_ptfs_status
 
     - name: Print requisite ptfs status
       ansible.builtin.debug:
-        var: requisite_ptfs_status
-      when: requisite_ptfs_status is defined
+        var: fix_repo_download_apply_individual_ptfs_requisite_ptfs_status
+      when: fix_repo_download_apply_individual_ptfs_requisite_ptfs_status is defined
 
     - name: End host (end_host)
       ansible.builtin.meta: end_host

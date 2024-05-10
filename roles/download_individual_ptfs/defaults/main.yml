@@ -1,3 +1,3 @@
 ---
 # Default values for download_individual_ptfs
-order_default: '*PTFID'
+download_individual_ptfs_order: '*PTFID'

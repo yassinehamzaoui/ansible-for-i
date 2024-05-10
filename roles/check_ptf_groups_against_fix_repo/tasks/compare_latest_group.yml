@@ -16,20 +16,21 @@
 - name: Query PTF group information from target system
   ibm.power_ibmi.ibmi_sql_query:
     sql: "SELECT PTF_GROUP_NAME,PTF_GROUP_DESCRIPTION,PTF_GROUP_LEVEL,PTF_GROUP_STATUS FROM
-    QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME = '{{ group.ptf_group_number }}' ORDER BY PTF_GROUP_LEVEL DESC LIMIT 1"
+      QSYS2.GROUP_PTF_INFO WHERE PTF_GROUP_NAME = '{{ group.ptf_group_number }}' ORDER BY PTF_GROUP_LEVEL DESC LIMIT 1"
   register: result
 
 - name: PTF group does not exist
   ansible.builtin.set_fact:
-    group_status: "{{ group_status | default([]) + [{'PTF_GROUP_NUMBER': group.ptf_group_number,
-    'PTF_GROUP_STATUS': 'NON-EXISTENT'}] }}"
+    check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) +
+      [{'PTF_GROUP_NUMBER': group.ptf_group_number, 'PTF_GROUP_STATUS': 'NON-EXISTENT'}] }}"
   when: result.row | length == 0
 
 - name: PTF group level does not match
   ansible.builtin.set_fact:
-    group_status: "{{ group_status | default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
-    'CURRENT_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_GROUP_LEVEL': group.ptf_group_level,
-    'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
+    check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) +
+      [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
+         'CURRENT_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_GROUP_LEVEL': group.ptf_group_level,
+         'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
   when:
     - result.row | length > 0
     - result.row[0]['PTF_GROUP_LEVEL'] != group.ptf_group_level
@@ -74,7 +75,7 @@
     - name: PTF exists but status is not APPLIED, PERMANENTLY APPLIED or SUPERSEDED
       ansible.builtin.set_fact:
         ptf_not_installed: "{{ ptf_not_installed | default([]) + [{ 'PTF_IDENTIFIER': ptf.PTF_IDENTIFIER,
-        'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS }] }}"
+          'PTF_LOADED_STATUS': ptf.PTF_LOADED_STATUS }] }}"
       when:
         - ptf.PTF_LOADED_STATUS != "APPLIED"
         - ptf.PTF_LOADED_STATUS != "PERMANENTLY APPLIED"
@@ -87,9 +88,10 @@
 
     - name: Compose group_status
       ansible.builtin.set_fact:
-        group_status: "{{ group_status | default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
-        'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level,
-        'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'], 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
+        check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([])
+          + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
+          'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level,
+          'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'], 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
       when:
         - result.row | length > 0
         - result.row[0]['PTF_GROUP_LEVEL'] | int == group.ptf_group_level
@@ -97,9 +99,10 @@
 
 - name: PTF group is installed
   ansible.builtin.set_fact:
-    group_status: "{{ group_status | default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
-    'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level,
-    'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
+    check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([]) +
+      [{ 'PTF_GROUP_NUMBER': group.ptf_group_number,
+      'CURRENT_PTF_GROUP_LEVEL': result.row[0]['PTF_GROUP_LEVEL'], 'LATEST_PTF_GROUP_LEVEL': group.ptf_group_level,
+      'PTF_GROUP_STATUS': result.row[0]['PTF_GROUP_STATUS'] }] }}"
   when:
     - result.row | length > 0
     - result.row[0]['PTF_GROUP_LEVEL'] | int == group.ptf_group_level

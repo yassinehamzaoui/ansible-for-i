@@ -5,18 +5,18 @@ This role will check the image files' checksum between target server and reposit
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                        |
-|-----------------------|---------------|--------------------------------------------------------------------|
-| `target_file_path`    | str           | The file path on target server. |
-| `repo_file_path`      | str           | The file path on repository server. |
-| `repo_server`         | str           | The system that has the src ptf group's files, which will be transferred to the target system. |
+| Variable                         | Type          | Description                                                        |
+|----------------------------------|---------------|--------------------------------------------------------------------|
+| `check_file_target_file_path`    | str           | The file path on target server. |
+| `check_file_repo_file_path`      | str           | The file path on repository server. |
+| `check_file_repo_server`         | str           | The system that has the src ptf group's files, which will be transferred to the target system. |
 
 Return Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `same_files`          | bool          | File consistency flag.                |
+| Variable                         | Type          | Description                                               |
+|----------------------------------|---------------|-----------------------------------------------------------|
+| `check_file_same_files`          | bool          | File consistency flag.                |
 
 Example Playbook
 ----------------
@@ -29,15 +29,15 @@ Example Playbook
       include_role:
         name: check_file
       vars:
-        target_file_path: "/home/tester/PTF/SF99876"
-        repo_file_path: "/tmp/SF99876"
-        repo_server: srchost
+        check_file_target_file_path: "/home/tester/PTF/SF99876"
+        check_file_repo_file_path: "/tmp/SF99876"
+        check_file_repo_server: srchost
 
 ```
 Example Returned Variables
 ----------------
 ```
-"same_files": true
+"check_file_same_files": true
 
 ```
 License

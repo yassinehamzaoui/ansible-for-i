@@ -42,5 +42,5 @@
   import_role:
     name: configure_passwordless_ssh_login
   vars:
-    target_user: '{{ansible_ssh_user}}'
-    public_key: '{{public_key_content}}'
+    configure_passwordless_ssh_login_target_user: '{{ansible_ssh_user}}'
+    configure_passwordless_ssh_login_public_key: '{{public_key_content}}'

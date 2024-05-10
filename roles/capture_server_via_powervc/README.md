@@ -5,11 +5,21 @@ Capture a virtual server via PowerVC to generate a deployable image.
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                      |
-|-----------------------|---------------|--------------------------------------------------|
-| `image_name`      | str          | Specifies the prefix of the new generated image. The final image name is composed by image_name + '_' + a random number. So that the image name can be unique.                   |
-| `vm_name`      | str          | Specifies the vm name or id which is to be captured.                      |
+| Variable                                       | Type          | Description                                      |
+|------------------------------------------------|---------------|--------------------------------------------------|
+| `capture_server_via_powervc_image_name`        | str           | Specifies the prefix of the new generated image. The final image name is composed by capture_server_via_powervc_image_name + '_' + a random number. So that the image name can be unique.                   |
+| `capture_server_via_powervc_vm_name`           | str           | Specifies the vm name or id which is to be captured.                      |
+| `capture_server_via_powervc_project`           | str           | Optional. Default value is "ibm-default".                                 |
+| `capture_server_via_powervc_project_domain`    | str           | Optional. Default value is "Default".                                     |
+| `capture_server_via_powervc_user_domain_name`  | str           | Optional. Default value is "Default".                                     |
+| `capture_server_via_powervc_validate_certs`    | bool          | Optional. Default value is True.                                          |
 
+Return Variables
+--------------
+
+| Variable                                 | Type          | Description                                                       |
+|------------------------------------------|---------------|-------------------------------------------------------------------|
+| `capture_server_via_powervc_image_info`  | list          | List of dictionaries describing matching images information  |
 
 Example Playbooks
 ----------------
@@ -21,26 +31,16 @@ Example Playbooks
       include_role: 
         name: capture_server_via_powervc
       vars:
-        image_name: 'ibmi-image'
-        vm_name: 'vm-to-be-captured'
+        capture_server_via_powervc_image_name: 'ibmi-image'
+        capture_server_via_powervc_vm_name: 'vm-to-be-captured'
+        capture_server_via_powervc_validate_certs: false
 
-```
-
-```
-- name: IBM i apply all loaded ptfs
-  hosts: powervc
-
-  roles:
-    - role: capture_server_via_powervc
-      vars:
-        image_name: 'ibmi-image'
-        vm_name: 'vm-to-be-captured'
 ```
 
 Returned Variables
 ----------------
 ```
-"openstack_image": {
+"capture_server_via_powervc_image_info": {
     "architecture": "ppc64",
     "checksum": null,
     "container_format": null,

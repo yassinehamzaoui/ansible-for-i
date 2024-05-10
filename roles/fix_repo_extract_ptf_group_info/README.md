@@ -6,17 +6,17 @@ and update ptf group's information into ptf_group_image_info table in catalog.
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                          |
-|-----------------------|---------------|----------------------------------------------------------------------|
-| `order_id`    | str           | The ptf group number will be download.                               |
+| Variable                                     | Type          | Description                                                          |
+|----------------------------------------------|---------------|----------------------------------------------------------------------|
+| `fix_repo_extract_ptf_group_info_order_id`   | str           | The ptf group number will be download.                               |
 
 Return Variables
 --------------
 
-| Variable                  | Type    | Description                                                                                    |
-|---------------------------|---------|------------------------------------------------------------------------------------------------|
-| `fix_repo_find_result`    | dict    | ibmi_fix_repo module returned result of added order's information in download_status table.        |
-| `fix_repo_update_result`  | dict    | ibmi_fix_repo module returned result of updated ptf group's information in ptf_group_image_info table.|
+| Variable                                                  | Type    | Description                                                                                    |
+|-----------------------------------------------------------|---------|------------------------------------------------------------------------------------------------|
+| `fix_repo_extract_ptf_group_info_fix_repo_find_result`    | dict    | ibmi_fix_repo module returned result of added order's information in download_status table.        |
+| `fix_repo_extract_ptf_group_info_fix_repo_update_result`  | dict    | ibmi_fix_repo module returned result of updated ptf group's information in ptf_group_image_info table.|
 
 Example Playbook
 ----------------
@@ -25,7 +25,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    order_id: "2376543543"
+    fix_repo_extract_ptf_group_info_order_id: "2376543543"
 
     - name: Include fix_repo_extract_ptf_group_info role to extract PTF group information and update into catalog
       include_role:

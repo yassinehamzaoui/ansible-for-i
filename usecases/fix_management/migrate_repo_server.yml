@@ -2,28 +2,29 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 # Description:
-  # The IBM i system where the repo server is located should be at the higest OS level. 
-  # This playbook is used for 2st level solution. It will package the repo server DB and files, then tranfer them to another IBM i system. 
+  # The IBM i system where the repo server is located should be at the higest OS level.
+  # This playbook is used for 2st level solution. It will package the repo server DB and files, then tranfer them to another IBM i system.
   # Then setup the new repository enviornment.
 
 # Parameters:
   # original_system -- Specifies the original repo server.
-  # target_system -- Specifies the new IBM i system which you want to migrate the repo server to.
-  # original_dir -- Specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.
-  # target_dir -- Specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+  # target_system   -- Specifies the new IBM i system which you want to migrate the repo server to.
+  # original_dir    -- Specifies the repo.sqlite3 DB dir on the original IBM i system, the default value is /etc/ibmi_ansible/fix_management.
+  # target_dir      -- Specifies the repo.sqlite3 DB dir on the target IBM i system, the default value is /etc/ibmi_ansible/fix_management.
 
 # Notes:
-  # The PTF Group image files dir on the target IBM i system must be the same as the original one, '/QIBM/UserData/OS/Service/ECS/PTF'. This playbook will not migrate the individual 
+  # The PTF Group image files dir on the target IBM i system must be the same as the original one, '/QIBM/UserData/OS/Service/ECS/PTF'.
+  # This playbook will not migrate the individual.
   # PTF savfs under QGPL libary, since such files will be auto downloaded again when you use it.
 
-# Command example: 
-  # ansible-playbook ./migrate_repo_server.yml -e "{'target_system': 'systemA', 'original_system': 'systemB', 'repo_dir': '/etc/ibmi_ansible/fix_management', 'target_dir': '/etc/ibmi_ansible/fix_management'}"
+# Command example:
+  # ansible-playbook ./migrate_repo_server.yml
+  #     -e "{'target_system': 'systemA', 'original_system': 'systemB', 'repo_dir': '/etc/ibmi_ansible/fix_management',
+  #          'target_dir': '/etc/ibmi_ansible/fix_management'}"
 ---
-- name: Migrate repository server to another IBM i system 
-  hosts: '{{ target_system }}'
+- name: Migrate repository server to another IBM i system
+  hosts: '{{ target_system | default([]) }}'
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     original_system: "{{ original_system }}"
@@ -32,29 +33,29 @@
 
   tasks:
     - name: Recursively find PTF Group files on original repo server
-      find:
+      ansible.builtin.find:
         paths: "/QIBM/UserData/OS/Service/ECS/PTF"
         recurse: true
       delegate_to: "{{ original_system }}"
       register: find_result
 
-    - name: debug original_dir
-      debug:
+    - name: Debug original_dir
+      ansible.builtin.debug:
         var: original_dir
 
-    - name: debug target_dir
-      debug:
+    - name: Debug target_dir
+      ansible.builtin.debug:
         var: target_dir
 
-    - name: compose src_list
-      set_fact:
+    - name: Compose src_list
+      ansible.builtin.set_fact:
         image_src_list: "{{ image_src_list | default([]) + [{ 'src': find_result_var.path, 'dest': find_result_var.path | dirname }] }}"
       loop: "{{ find_result.files }}"
       loop_control:
         loop_var: find_result_var
 
-    - name: debug image_src_list
-      debug:
+    - name: Debug image_src_list
+      ansible.builtin.debug:
         var: image_src_list
 
     - name: Transfer PTF Group image files to target_system
@@ -64,8 +65,8 @@
       delegate_to: "{{ original_system }}"
       register: image_sync_result
 
-    - name: debug image_sync_result
-      debug:
+    - name: Debug image_sync_result
+      ansible.builtin.debug:
         var: image_sync_result
 
     - name: Transfer repo to target_system
@@ -75,6 +76,6 @@
       delegate_to: "{{ original_system }}"
       register: repo_sync_result
 
-    - name: debug repo_sync_result
-      debug:
+    - name: Debug repo_sync_result
+      ansible.builtin.debug:
         var: repo_sync_result

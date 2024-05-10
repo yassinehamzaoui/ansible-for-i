@@ -36,7 +36,7 @@
 
         - name: Compose apply fail list
           ansible.builtin.set_fact:
-            apply_fail_list: "{{ apply_fail_list | default([]) + [not_loaded_list_var.ptf_id] }}"
+            sync_apply_individual_ptfs_lv1_apply_fail_list: "{{ sync_apply_individual_ptfs_lv1_apply_fail_list | default([]) + [not_loaded_list_var.ptf_id] }}"
 
     - name: Apply success
       when: apply_result.rc == 0
@@ -51,4 +51,5 @@
 
         - name: Compose apply success list
           ansible.builtin.set_fact:
-            apply_success_list: "{{ apply_success_list | default([]) + [not_loaded_list_var.ptf_id] }}"
+            sync_apply_individual_ptfs_lv1_apply_success_list: "{{ sync_apply_individual_ptfs_lv1_apply_success_list | default([])
+                                                                   + [not_loaded_list_var.ptf_id] }}"

@@ -7,22 +7,22 @@ ptfs and write the information into catalog.
 Role Variables
 --------------
 
-| Variable               | Type          | Description                                                            |
-|------------------------|---------------|------------------------------------------------------------------------|
-| `ptfs_list_parm`| list          | The list of ptfs that need to be checked and downloaded.     |
-| `order`| str          | Specifies if requisite PTFs should be included with the ordered PTFs. The default value is '*PTFID'.     |
-| `repo_server`| str          | Specifies the SNDPTFORD server used to download ptfs.     |
+| Variable                                                  | Type          | Description                                                            |
+|-----------------------------------------------------------|---------------|------------------------------------------------------------------------|
+| `fix_repo_check_download_individual_ptfs_ptfs_list_parm`| list          | The list of ptfs that need to be checked and downloaded.     |
+| `fix_repo_check_download_individual_ptfs_order`| str          | Specifies if requisite PTFs should be included with the ordered PTFs. The default value is '*PTFID'.     |
+| `fix_repo_check_download_individual_ptfs_repo_server`| str          | Specifies the SNDPTFORD server used to download ptfs.     |
 
 Return Variables
 --------------
 
-| Variable                | Type          | Description                                                       |
-|-------------------------|---------------|-------------------------------------------------------------------|
-| `check_fail_list` | list          | The list of ptfs which records are found in catalog with errors. |
-| `record_not_found_list` | list          | The list of ptfs which records are not found in the catalog.                                  |
-| `download_success_list` | list          | The list of successful download.                                  |
-| `download_fail_list`    | list          | The list of failed download.                                      |
-| `final_find_result` | list          | The final information records in the catalog of requested ptfs list.           |
+| Variable                                                        | Type          | Description                                                       |
+|-----------------------------------------------------------------|---------------|-------------------------------------------------------------------|
+| `fix_repo_check_download_individual_ptfs_check_fail_list` | list          | The list of ptfs which records are found in catalog with errors. |
+| `fix_repo_check_download_individual_ptfs_record_not_found_list` | list          | The list of ptfs which records are not found in the catalog.                                  |
+| `fix_repo_check_download_individual_ptfs_download_success_list` | list          | The list of successful download.                                  |
+| `fix_repo_check_download_individual_ptfs_download_fail_list`    | list          | The list of failed download.                                      |
+| `fix_repo_check_download_individual_ptfs_final_find_result` | list          | The final information records in the catalog of requested ptfs list.           |
 
 Example Playbook
 ----------------
@@ -31,8 +31,8 @@ Example Playbook
   hosts: repo_server
 
   vars:
-    ptfs_list_parm: ['SI67856', 'SI69375', 'SI73751']
-    repo_server: systemA
+    fix_repo_check_download_individual_ptfs_ptfs_list_parm: ['SI67856', 'SI69375', 'SI73751']
+    fix_repo_check_download_individual_ptfs_repo_server: systemA
 
   tasks:
     - name: Include fix_repo_check_download_individual_ptfs role to download a list of individual ptfs
@@ -43,7 +43,7 @@ Example Playbook
 Example Returned Variables
 ----------------
 ```
-"download_success_list": [
+"fix_repo_check_download_individual_ptfs_download_success_list": [
         {
             "download_time": "2020-12-02T23:55:16.626231",
             "file_name": "QSI74136",
@@ -54,13 +54,13 @@ Example Returned Variables
             "release": "V7R3M0"
         },
 ]
-"download_fail_list": [
+"fix_repo_check_download_individual_ptfs_download_fail_list": [
         {
             "fail_reason": "Submit job failed.",
             "ptf_id": "123456"
         }
 ]
-"check_fail_list": [
+"fix_repo_check_download_individual_ptfs_check_fail_list": [
         {
             "add_time": "2020-11-23 09:01:03",
             "checksum": "d7d8d4787e2a1d858f3523f2ec963f7dbc9f78ff",
@@ -80,7 +80,7 @@ Example Returned Variables
         }
 
 ]
-"record_not_found_list": [
+"fix_repo_check_download_individual_ptfs_record_not_found_list": [
         {
             "add_time": "2020-11-23 09:01:03",
             "checksum": "d7d8d4787e2a1d858f3523f2ec963f7dbc9f78ff",
@@ -116,7 +116,7 @@ Example Returned Variables
             "release": "V7R3M0"
         }
     ]
-"final_find_result": {
+"fix_repo_check_download_individual_ptfs_final_find_result": {
         "action": "find",
         "changed": false,
         "checksum": true,

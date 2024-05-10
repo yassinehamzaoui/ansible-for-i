@@ -6,21 +6,19 @@
 
 # Parameters:
   # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
-  # order_id -- order_id returned from the ibmi_download_fix module.
+  # order_id    -- order_id returned from the ibmi_download_fix module.
 
-# Command example: 
+# Command example:
   # ansible-playbook ./extract_ptf_group_info.yml -e "{'repo_server': 'reposerver', 'order_id': '2025910369', 'database': '/ansible/repo.sqlite3'}"
 ---
 - name: Extract PTF group information and write into catalog
-  hosts: "{{ repo_server }}"
+  hosts: "{{ repo_server | default([]) }}"
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
-    order_id: "{{ order_id }}"
+    fix_repo_extract_ptf_group_info_order_id: "{{ order_id }}"
 
   tasks:
     - name: Include extract_ptf_group_info role to extract PTF group information and write into catalog
-      include_role:
+      ansible.builtin.include_role:
         name: fix_repo_extract_ptf_group_info

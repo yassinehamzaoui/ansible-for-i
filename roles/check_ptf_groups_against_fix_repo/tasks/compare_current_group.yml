@@ -63,5 +63,6 @@
 
 - name: Compose group_status
   ansible.builtin.set_fact:
-    group_status: "{{ group_status | default([]) + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
-    'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"
+    check_ptf_groups_against_fix_repo_group_status: "{{ check_ptf_groups_against_fix_repo_group_status | default([])
+      + [{ 'PTF_GROUP_NUMBER': group.ptf_group_number, 'CURRENT_PTF_GROUP_LEVEL': group.ptf_group_level,
+           'PTF_GROUP_STATUS': 'NOT INSTALLED', 'PTF_NOT_INSTALLED': ptf_not_installed }] }}"

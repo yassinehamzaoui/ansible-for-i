@@ -6,19 +6,19 @@ in ptf_group_image table or already downloading.
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                          |
-|-----------------------|---------------|----------------------------------------------------------------------|
-| `ptf_group`           | str           | The ptf group number will be checked.                                |
+| Variable                                 | Type          | Description                                                          |
+|------------------------------------------|---------------|----------------------------------------------------------------------|
+| `fix_repo_check_ptf_group_ptf_group`     | str           | The ptf group number will be checked.                                |
 
 Return Variables
 --------------
 
-| Variable                      | Type          | Description                                                                                   |
-|-------------------------------|---------------|-----------------------------------------------------------------------------------------------|
-| `fix_group_check_result`      | dict          | ibmi_fix_group_check module returned result of the latest ptf group's information.            |
-| `ptf_group_find_result`       | dict          | ibmi_fix_repo module returned result of ptf group's information in ptf_group_image_info table.|
-| `download_status_find_result` | dict          | ibmi_fix_repo module returned result of ptf group's information in download_status table.     |
-| `check_ptf_group_fail` | bool          | The flag indicates whether fix_repo_check_ptf_group role ended successfully or failed.     |
+| Variable                                               | Type          | Description                                                                                   |
+|--------------------------------------------------------|---------------|-----------------------------------------------------------------------------------------------|
+| `fix_repo_check_ptf_group_fix_group_check_result`      | dict          | ibmi_fix_group_check module returned result of the latest ptf group's information.            |
+| `fix_repo_check_ptf_group_ptf_group_find_result`       | dict          | ibmi_fix_repo module returned result of ptf group's information in ptf_group_image_info table.|
+| `fix_repo_check_ptf_group_download_status_find_result` | dict          | ibmi_fix_repo module returned result of ptf group's information in download_status table.     |
+| `fix_repo_check_ptf_group_check_ptf_group_fail` | bool          | The flag indicates whether fix_repo_check_ptf_group role ended successfully or failed.     |
 
 Example Playbook
 ----------------
@@ -27,7 +27,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group: "SF99740"
+    fix_repo_check_ptf_group_ptf_group: "SF99740"
 
   tasks:
     - name: Include fix_repo_check_ptf_group role to check if the latest ptf group is already in catalog
@@ -39,7 +39,7 @@ Example Playbook
 Returned variables example
 --------------------------
 ```
-"fix_group_check_result": {
+"fix_repo_check_ptf_group_fix_group_check_result": {
     "changed": false,
     "count": 1,
     "elapsed_time": "0:00:01.819350",
@@ -243,7 +243,7 @@ Returned variables example
     "stderr_lines": []
 }
 
-"ptf_group_find_result": {
+"fix_repo_check_ptf_group_ptf_group_find_result": {
     "action": "find",
     "changed": false,
     "checksum": false,
@@ -274,7 +274,7 @@ Returned variables example
     "type": "ptf_group"
 }
 
-"download_status_find_result": {
+"fix_repo_check_ptf_group_download_status_find_result": {
     "action": "find",
     "changed": false,
     "checksum": false,

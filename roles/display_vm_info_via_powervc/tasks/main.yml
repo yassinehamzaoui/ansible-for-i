@@ -6,9 +6,9 @@
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
       password: '{{ ansible_ssh_pass }}'
-      project_name: '{{ project }}'
-      project_domain_name: '{{ project_domain }}'
-      user_domain_name: '{{ user_domain }}'
-    server: '{{ vm_name }}'
-    verify: '{{ verify_cert }}'
-  register: vm_info_result
+      project_name: '{{ display_vm_info_via_powervc_project }}'
+      project_domain_name: '{{ display_vm_info_via_powervc_project_domain }}'
+      user_domain_name: '{{ display_vm_info_via_powervc_user_domain }}'
+    server: '{{ display_vm_info_via_powervc_vm_name }}'
+    validate_certs: '{{ display_vm_info_via_powervc_validate_certs }}'
+  register: display_vm_info_via_powervc_vm_info_result

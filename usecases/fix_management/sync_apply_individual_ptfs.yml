@@ -7,38 +7,39 @@
   # the target system. Then load and apply.
 
 # Parameters:
-  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # repo_server   -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
   # target_system -- The target IBM i server that receives and applies the PTFs.
-  # ptfs_list -- The list of PTFs to be processed.
-  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
-  # apply_all_loaded_ptfs -- Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. The default value is True.
-  # temp_or_perm -- Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.
-  # delayed_option -- Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'. 
-  # auto_ipl -- Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false.
+  # ptfs_list     -- The list of PTFs to be processed.
+  # delete        -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+  # apply_all_loaded_ptfs -- Used by apply_ptf role. Controls whether all loaded ptf will be applied.
+  #                          When the value is true, 'to_be_applied_list' will be ignored. The default value is True.
+  # temp_or_perm   -- Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'.
+  #                   Default value is '*TEMP'.
+  # delayed_option -- Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.
+  # auto_ipl       -- Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied
+  #                   or temporary applied. The default value is false.
 
-# Command example: 
-  # ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB', 
-  #  'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
-  # 'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
+# Command example:
+  # ansible-playbook ./sync_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB',
+  #     'ptfs_list': ['SI67856', 'SI69375', 'SI73751'], 'apply_all_loaded_ptfs': false, 'temp_or_perm': '*TEMP',
+  #     'delayed_option': '*IMMDLY', 'auto_ipl': false, 'delete': true}"
 ---
 - name: Sync and apply a list of individual ptfs
-  hosts: '{{ target_system }}'
+  hosts: '{{ target_system | default([]) }}'
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     repo_server: "{{ repo_server }}"
     ptfs_list: "{{ ptfs_list }}"
 
   tasks:
-    - name: set_fact
-      set_fact:
+    - name: Set list
+      ansible.builtin.set_fact:
         list: "{{ list|default([]) + [{'ptf_id': item }] }}"
       loop: "{{ ptfs_list }}"
 
     - name: Get the individual ptfs' information in catalog
-      ibmi_fix_repo:
+      ibm.power_ibmi.ibmi_fix_repo:
         type: "single_ptf"
         checksum: true
         action: "find"
@@ -46,50 +47,56 @@
       delegate_to: "{{ repo_server }}"
       register: fix_repo_find_result
 
-    - name: fail condition
-      fail:
+    - name: Fail condition
+      ansible.builtin.fail:
         msg: "No available individual ptf in catalog, quit."
       when: fix_repo_find_result.success_list is not defined
 
     - name: Print find success list in catalog
-      debug:
+      ansible.builtin.debug:
         var: fix_repo_find_result.success_list
       when: fix_repo_find_result.success_list is defined
 
     - name: Print find failed list in catalog
-      debug:
+      ansible.builtin.debug:
         var: fix_repo_find_result.fail_list
       when: fix_repo_find_result.fail_list is defined
 
     - name: Include check_ptf role to determine which ptfs need to apply
-      include_role:
+      ansible.builtin.include_role:
         name: check_ptf
       vars:
         check_ptf_list: "{{ fix_repo_find_result.success_list }}"
 
-    - block:
+    - name: Handling case for when no PTFs to apply
+      when: check_ptf_not_loaded_ptfs_list == [] and check_ptf_loaded_ptfs_list == []
+      block:
         - name: Debug msg
-          debug:
+          ansible.builtin.debug:
             msg: "No individual ptf need to be applied, quit."
 
-        - name: end_host
-          meta: end_host
-      when: not_loaded_ptfs_list == [] and loaded_ptfs_list == []
+        - name: End host
+          ansible.builtin.meta: end_host
 
     - name: Include sync_apply_individual_ptfs role to transfer a list of individual ptfs to target ibm i, then load and apply
-      include_role:
+      ansible.builtin.include_role:
         name: sync_apply_individual_ptfs
       vars:
-        not_loaded_list: "{{ not_loaded_ptfs_list }}"
-        src_host: "{{ repo_server }}"
-        already_loaded_list: "{{ loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_not_loaded_list: "{{ check_ptf_not_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_src_host: "{{ repo_server }}"
+        sync_apply_individual_ptfs_already_loaded_list: "{{ check_ptf_loaded_ptfs_list }}"
+        sync_apply_individual_ptfs_delete: "{{ delete }}"
+        sync_apply_individual_ptfs_apply_all_loaded_ptf: "{{ apply_all_loaded_ptfs }}"
+        sync_apply_individual_ptfs_temp_or_perm: "{{ temp_or_perm }}"
+        sync_apply_individual_ptfs_delayed_option: "{{ delayed_option }}"
+        sync_apply_individual_ptfs_auto_ipl: "{{ auto_ipl }}"
 
     - name: Include check_ptf role again to get the final applied result
-      include_role:
+      ansible.builtin.include_role:
         name: check_ptf
       vars:
         check_ptf_list: "{{ fix_repo_find_result.success_list }}"
 
     - name: Print find fail list in catalog
-      debug:
+      ansible.builtin.debug:
         var: fix_repo_find_result.fail_list | default([])

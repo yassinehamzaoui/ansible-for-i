@@ -12,7 +12,7 @@
   ansible.builtin.set_fact:
     same_name: true
 
-- name: Set same_files to false when checksum are not the same
+- name: Set check_file_same_files to false when checksum are not the same
   ansible.builtin.set_fact:
-    same_files: false
+    check_file_same_files: false
   when: find_result_target_var.checksum != find_result_repo_var.checksum

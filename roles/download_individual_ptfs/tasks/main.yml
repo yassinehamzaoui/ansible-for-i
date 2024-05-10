@@ -2,19 +2,19 @@
 # Tasks file for download_individual_ptfs
 - name: Initialize download_success_list and download_fail_list
   ansible.builtin.set_fact:
-    download_success_list: []
-    download_fail_list: []
+    download_individual_ptfs_download_success_list: []
+    download_individual_ptfs_download_fail_list: []
 
 - name: Download ptfs from save file
   ansible.builtin.include_tasks: download_individual_ptf.yml
-  loop: "{{ to_be_downloaded_list }}"
+  loop: "{{ download_individual_ptfs_to_be_downloaded_list }}"
   loop_control:
     loop_var: download_ptf
 
 - name: Print the successful download list
   ansible.builtin.debug:
-    var: download_success_list
+    var: download_individual_ptfs_download_success_list
 
 - name: Print the failed download list
   ansible.builtin.debug:
-    var: download_fail_list
+    var: download_individual_ptfs_download_fail_list

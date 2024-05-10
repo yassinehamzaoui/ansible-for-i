@@ -1,4 +1,4 @@
 ---
 # Default values for sync_apply_ptf_group
-dest: "~/PTF/ptfgroup"
-delete: true
+sync_apply_ptf_group_dest: "~/PTF/ptfgroup"
+sync_apply_ptf_group_delete: true

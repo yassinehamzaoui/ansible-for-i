@@ -4,16 +4,30 @@
     include_role:
       name: sync_apply_individual_ptfs
     vars:
-      not_loaded_list: 
+      sync_apply_individual_ptfs_not_loaded_list: 
         - {'ptf_id':'SI99999', 'product':'5770SS1', 'file_name':'QSI99999.file', 'file_path': '/qsys.lib/qgpl.lib/QSI99999.FILE'}
-      src_host: "fix_repo"
-      temp_or_perm: '*TEMP'
-      apply_all_loaded_ptf: true
-      auto_ipl: false
+      sync_apply_individual_ptfs_src_host: "fix_repo"
+      sync_apply_individual_ptfs_temp_or_perm: '*TEMP'
+      sync_apply_individual_ptfs_apply_all_loaded_ptf: true
+      sync_apply_individual_ptfs_auto_ipl: false
   
-  - name: assert values
+  - name: Assert return variables are defined
+    ansible.builtin.assert:
+      that:
+        - sync_apply_individual_ptfs_sync_success_list is defined
+        - sync_apply_individual_ptfs_sync_fail_list is defined
+        - sync_apply_individual_ptfs_load_success_list is defined
+        - sync_apply_individual_ptfs_load_fail_list is defined
+        - sync_apply_individual_ptfs_load_fail_dict is defined
+        - sync_apply_individual_ptfs_apply_fail_with_requisite_list is defined
+        - sync_apply_individual_ptfs_apply_fail_dict is defined
+        - sync_apply_individual_ptfs_requisite_list is defined
+        - sync_apply_individual_ptfs_apply_success_list is defined
+        - sync_apply_individual_ptfs_apply_fail_list is defined
+
+  - name: Assert values
     assert:
       that:
-        - sync_fail_list | length == 1
-        - sync_success_list | length == 0
-        - "'No such file or directory' in sync_fail_list[0]['fail_reason']"
+        - sync_apply_individual_ptfs_sync_fail_list | length == 1
+        - sync_apply_individual_ptfs_sync_success_list | length == 0
+        - "'No such file or directory' in sync_apply_individual_ptfs_sync_fail_list[0]['fail_reason']"

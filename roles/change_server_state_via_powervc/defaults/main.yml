@@ -2,8 +2,8 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 # defaults value for change_server_state_via_powervc
-project: ibm-default
-project_domain: Default
-user_domain: Default
-verify_cert: true
-change_state_timeout: 1800
+change_server_state_via_powervc_project: ibm-default
+change_server_state_via_powervc_project_domain: Default
+change_server_state_via_powervc_user_domain: Default
+change_server_state_via_powervc_validate_certs: true
+change_server_state_via_powervc_change_state_timeout: 1800

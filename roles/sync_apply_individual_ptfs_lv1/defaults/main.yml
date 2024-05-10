@@ -1,4 +1,8 @@
 ---
-# Default values for sync_apply_individual_ptfs
-already_loaded_list: []
-delete: true
+# Default values for sync_apply_individual_ptfs_lv1
+sync_apply_individual_ptfs_lv1_already_loaded_list: []
+sync_apply_individual_ptfs_lv1_delete: true
+sync_apply_individual_ptfs_lv1_apply_all_loaded_ptf: true
+sync_apply_individual_ptfs_lv1_temp_or_perm: '*TEMP'
+sync_apply_individual_ptfs_lv1_delayed_option: '*IMMDLY'
+sync_apply_individual_ptfs_lv1_auto_ipl: false

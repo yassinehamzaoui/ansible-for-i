@@ -3,22 +3,22 @@
 
 # Description:
   # This playbook will transfer the ptf files to the target system, and apply ptf.
-  # Before use this playbook, make sure you have used the copy_individual_ptf_to_repo.yml to transfer files to repo server, then the ptf dir on repo server should be formatted as ~/PTF/ptf_number.
+  # Before use this playbook, make sure you have used the copy_individual_ptf_to_repo.yml to transfer files to repo server,
+  # then the ptf dir on repo server should be formatted as ~/PTF/ptf_number.
 
 # Parameters:
-  # repo_server -- The IBM i/Linux server stores PTFs and PTF groups. 
+  # repo_server   -- The IBM i/Linux server stores PTFs and PTF groups.
   # target_system -- The target IBM i server that receives and applies the PTFs.
-  # ptf_number -- Specifies the PTF number which needs to be applied on target IBM i system.
-  # delete -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
+  # ptf_number    -- Specifies the PTF number which needs to be applied on target IBM i system.
+  # delete        -- Specifies whether or not to delete the file install dir on target server after apply. The default value is true.
 
-# Command example: 
-  # ansible-playbook ./sync_apply_individual_ptf_using_ptfinfo.yml -e "{'target_system': 'systemA', 'repo_server': 'systemB','ptf_number': 'SI69385', 'delete': true}"
+# Command example:
+  # ansible-playbook ./sync_apply_individual_ptf_using_ptfinfo.yml -e
+  #     "{'target_system': 'systemA', 'repo_server': 'systemB','ptf_number': 'SI69385', 'delete': true}"
 ---
-- name: Sync and apply ptf files
-  hosts: '{{ target_system }}'
+- name: Playbook to sync and apply ptf files
+  hosts: '{{ target_system | default([]) }}'
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     repo_server: "{{ repo_server }}"
@@ -26,87 +26,92 @@
     deletefile: "{{ delete | default(true) }}"
 
   tasks:
-    - name: set_fact
-      set_fact:
+    - name: Set repo_dir
+      ansible.builtin.set_fact:
         repo_dir: "~/PTF/{{ ptf_number }}"
 
     - name: Print repo_dir
-      debug:
+      ansible.builtin.debug:
         var: repo_dir
 
     - name: Recursively find ptf files
-      find:
+      ansible.builtin.find:
         paths: "{{ repo_dir }}"
         recurse: true
       delegate_to: "{{ repo_server }}"
       register: find_result
 
     - name: Print find_result
-      debug:
+      ansible.builtin.debug:
         var: find_result
 
-    - name: quit
-      fail:
+    - name: Quit
+      ansible.builtin.fail:
         msg: "repo_dir: {{ repo_dir }} is not valid or doesn't contain any file, quit."
       when: find_result.matched == 0
 
     - name: Compose target tmp dir str
-      set_fact:
+      ansible.builtin.set_fact:
         path: "{{ repo_dir }}"
 
-    - name: check if the folder is already exists
+    - name: Check if the folder is already exists
       ansible.builtin.stat:
         path: "{{ path }}"
       register: stat_result
       ignore_errors: true
 
     - name: Include check_file role to check if files are the same
-      include_role:
+      ansible.builtin.include_role:
         name: check_file
       vars:
-        target_file_path: "{{ path }}"
-        repo_file_path: "{{ repo_dir }}"
+        check_file_target_file_path: "{{ path }}"
+        check_file_repo_file_path: "{{ repo_dir }}"
+        check_file_repo_server: "{{ repo_server }}"
       when: stat_result.stat.exists
 
-    - block:
+    - name: Perform transfer actions
+      when: (check_file_same_files is defined and not check_file_same_files) or not stat_result.stat.exists
+      block:
         - name: Clear receive dir
-          file:
+          ansible.builtin.file:
             path: "{{ path }}"
             state: absent
           register: clear_result
           ignore_errors: true
 
         - name: Make receive dir
-          file:
+          ansible.builtin.file:
             path: "{{ path }}"
             state: directory
-            mode: 0755
+            mode: "0755"
           register: file_result
           ignore_errors: true
 
-        - block:
+        - name: Handling receive dir creation failure
+          when: file_result.failed == 1
+          block:
             - name: Skip when make receive dir fail
-              debug:
+              ansible.builtin.debug:
                 msg: "{{ 'Make receive dir ' + path + ' fail, end host.' }}"
 
-            - name: end_host
-              meta: end_host
-          when: file_result.failed == 1
+            - name: End host
+              ansible.builtin.meta: end_host
 
-        - block:
-            - name: compose src_list
-              set_fact:
+        - name: Transfer images
+          block:
+            - name: Compose src_list
+              ansible.builtin.set_fact:
                 src_list: "{{ src_list | default([]) + [{ 'src': find_result_files_var.path }] }}"
               loop: "{{ find_result.files }}"
               loop_control:
                 loop_var: find_result_files_var
 
-            - name: debug src_list
-              debug:
+            - name: Debug src_list
+              ansible.builtin.debug:
                 var: src_list
 
             # - name: Print path
-            #   debug:
+            #   ansible.builtin.debug:
             #     var: path
 
             - name: Transfer image to target_system
@@ -117,41 +122,42 @@
               register: sync_result
 
             - name: Print transfer
-              debug:
+              ansible.builtin.debug:
                 var: sync_result
 
-            - block:
-                - name: skip when transfer failed
-                  debug:
+            - name: Handling transfer failure
+              when: sync_result.fail_list != []
+              block:
+                - name: Skip when transfer failed
+                  ansible.builtin.debug:
                     msg: "One or more ptf file transfer failed, quit apply ptf action."
 
-                - name: delete the dest file dir
-                  file:
+                - name: Delete the dest file dir
+                  ansible.builtin.file:
                     path: "{{ path }}"
                     state: absent
-                  ignore_errors: true
+                  failed_when: false
                   when: deletefile
 
-                - name: end_host
-                  meta: end_host
-              when: sync_result.fail_list != []
-
-      when: (same_files is defined and not same_files) or not stat_result.stat.exists
+                - name: End host
+                  ansible.builtin.meta: end_host
 
     - name: Get the home dir on target server
-      shell: 'echo $HOME'
+      ansible.builtin.shell: 'echo $HOME'
       register: home_dir
+      changed_when: false
 
     - name: Compose path
-      set_fact:
+      ansible.builtin.set_fact:
         path: "{{ path | regex_replace('~', home_dir.stdout) }}"
       when: path | regex_search("^~")
 
-    - name: debug path
-      debug:
+    - name: Debug path
+      ansible.builtin.debug:
         var: path
 
-    - block:
+    - name: Actions to apply PTF
+      block:
         - name: Apply PTF
           ibm.power_ibmi.ibmi_fix_imgclg:
             src: '{{ path }}'
@@ -161,22 +167,22 @@
           ignore_errors: true
 
         - name: Print apply result
-          debug:
+          ansible.builtin.debug:
             var: apply_result
 
         - name: Print apply result
-          debug:
+          ansible.builtin.debug:
             msg: "PTF applied fail. Please see above job log"
           when: apply_result.rc != 0
 
         - name: Print apply result
-          debug:
+          ansible.builtin.debug:
             msg: "PTF applied succesfully."
           when: apply_result.rc == 0
 
-    - name: delete the dest file dir
-      file:
+    - name: Delete the dest file dir
+      ansible.builtin.file:
         path: "{{ path }}"
         state: absent
-      ignore_errors: true
+      failed_when: false
       when: deletefile

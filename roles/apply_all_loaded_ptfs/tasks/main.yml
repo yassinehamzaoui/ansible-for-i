@@ -5,8 +5,8 @@
 - name: Apply all loaded ptfs with ibmi_fix
   ibm.power_ibmi.ibmi_fix:
     product_id: "*ALL"
-    delayed_option: '{{ delayed_option }}'
-    temp_or_perm: '{{ temp_or_perm }}'
+    delayed_option: '{{ apply_all_loaded_ptfs_delayed_option }}'
+    temp_or_perm: '{{ apply_all_loaded_ptfs_temp_or_perm }}'
     operation: 'apply_only'
   register: apply_fix_result
 
@@ -19,7 +19,7 @@
   register: query_ptf_result
 
 - name: |
-    Reboot the system immediately if auto_ipl is set to true and at
+    Reboot the system immediately if apply_all_loaded_ptfs_auto_ipl is set to true and at
     least one to-be-applied PTF requires an IPL
   ibm.power_ibmi.ibmi_reboot:
-  when: auto_ipl and query_ptf_result.row | length > 0
+  when: apply_all_loaded_ptfs_auto_ipl and query_ptf_result.row | length > 0

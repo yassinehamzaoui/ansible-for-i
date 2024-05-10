@@ -2,25 +2,25 @@
 # Tasks file for load_ptf
 - name: Initialize some variables
   ansible.builtin.set_fact:
-    load_success_list: []
-    load_fail_list: []
+    load_ptf_load_success_list: []
+    load_ptf_load_fail_list: []
     option_not_installed: []
-    load_fail_dict: {}
+    load_ptf_load_fail_dict: {}
 
 - name: Load ptfs from save file
   ansible.builtin.include_tasks: load_individual_ptf.yml
-  loop: "{{ to_be_loaded_list }}"
+  loop: "{{ load_ptf_to_be_loaded_list }}"
   loop_control:
     loop_var: load_ptf
 
 - name: Print the successfully load list
   ansible.builtin.debug:
-    var: load_success_list
+    var: load_ptf_load_success_list
 
 - name: Print the fail load list
   ansible.builtin.debug:
-    var: load_fail_list
+    var: load_ptf_load_fail_list
 
 - name: Print the fail load dict
   ansible.builtin.debug:
-    var: load_fail_dict
+    var: load_ptf_load_fail_dict

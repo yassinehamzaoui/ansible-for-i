@@ -1,5 +1,22 @@
 # Change Log
 
+## v3.0.0 (2024-05-10)
+
+This release includes the final changes to ensure continued compliance with the Redhat certification process.
+This is a disruptive API change with the collection roles that impacts the naming of all the role variables and
+role return variables. All user playbooks using roles must be updated in order to work with this release.
+Each role README file fully documents the new role variable names and the naming convention used is noted below.
+
+The following changes are included with this release:
+
+- Ansible lint clean up for fix management use cases.
+- Clean-up of role variables to use a global naming convention that prepends the role name to each role variable
+  and role return variable.   For example, with the apply_ptf role, the variable "to_be_applied_list"
+  is now "apply_ptf_to_be_applied_list". This convention is followed 99% of the time. This change with roles required
+  updating all the use cases and also the role integration tests.
+- Numerous fixes for the role integration tests along with updating PTFs used in the tests. This is still a work in progress.
+- Various fixes for issues that became apparent with the global role variable naming.
+
 ## v2.0.2 (2024-04-24)
 
 This release primarily addresses the fix check breakage from the recent PSP web site updates.

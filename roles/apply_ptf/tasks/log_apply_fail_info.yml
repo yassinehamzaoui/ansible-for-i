@@ -13,9 +13,9 @@
 - name: Add to apply failure dictionary and requisite list
   when: job_log_var.MESSAGE_ID == 'CPF3632' or job_log_var.MESSAGE_ID == 'CPD35B1'
   block:
-    - name: Compose apply_fail_dict
+    - name: Compose apply_ptf_apply_fail_dict
       ansible.builtin.set_fact:
-        apply_fail_dict: "{{ apply_fail_dict | default({}) | combine({job_log_var.MESSAGE_TOKENS[21:28]: 'APPLY_FAIL'}) }}"
-    - name: Compose requisite_list
+        apply_ptf_apply_fail_dict: "{{ apply_ptf_apply_fail_dict | default({}) | combine({job_log_var.MESSAGE_TOKENS[21:28]: 'APPLY_FAIL'}) }}"
+    - name: Compose apply_ptf_requisite_list
       ansible.builtin.set_fact:
-        requisite_list: "{{ requisite_list + [job_log_var.MESSAGE_TOKENS[7:14]] }}"
+        apply_ptf_requisite_list: "{{ apply_ptf_requisite_list + [job_log_var.MESSAGE_TOKENS[7:14]] }}"

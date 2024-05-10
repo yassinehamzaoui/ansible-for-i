@@ -3,16 +3,16 @@
 - name: Fail the playbook if repo_server is invalid
   ansible.builtin.fail:
     msg: "repository server is not provided, please provide the repository server."
-  when: not repo_server or repo_server is undefined
+  when: not check_ptfs_by_product_against_fix_repo_repo_server or check_ptfs_by_product_against_fix_repo_repo_server is undefined
 
 - name: Fail the playbook if product is invalid
   ansible.builtin.fail:
     msg: "product is not provided, please provide the product id."
-  when: not product or product is undefined
+  when: not check_ptfs_by_product_against_fix_repo_product or check_ptfs_by_product_against_fix_repo_product is undefined
 
 - name: Initialize ptf_status
   ansible.builtin.set_fact:
-    ptf_status: []
+    check_ptfs_by_product_against_fix_repo_ptf_status: []
 
 - name: Query system release
   ibm.power_ibmi.ibmi_sql_query:
@@ -28,13 +28,14 @@
     action: "find"
     type: "single_ptf"
     parameters:
-      - {'product': '{{ product }}', 'release': '{{ release }}'}
-  delegate_to: "{{ repo_server }}"
+      - {'product': '{{ check_ptfs_by_product_against_fix_repo_product }}', 'release': '{{ release }}'}
+  delegate_to: "{{ check_ptfs_by_product_against_fix_repo_repo_server }}"
   register: product_info
 
 - name: Got record failed from repository server
   ansible.builtin.set_fact:
-    ptf_status: "{{ ptf_status | default([]) + [{ 'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB' }] }}"
+    check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
+      [{ 'PRODUCT': prod.product, 'PRODUCT_STATUS': 'Record not found in repository DB' }] }}"
   when: product_info.get('fail_list')
   with_list: "{{ product_info.fail_list }}"
   loop_control:

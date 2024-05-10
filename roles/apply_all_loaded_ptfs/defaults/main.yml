@@ -2,6 +2,6 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 # default values for apply_all_loaded_ptfs
-temp_or_perm: '*TEMP'
-delayed_option: '*IMMDLY'
-auto_ipl: false
+apply_all_loaded_ptfs_temp_or_perm: '*TEMP'
+apply_all_loaded_ptfs_delayed_option: '*IMMDLY'
+apply_all_loaded_ptfs_auto_ipl: false

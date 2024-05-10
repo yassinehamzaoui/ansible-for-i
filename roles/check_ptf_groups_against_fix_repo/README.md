@@ -6,17 +6,18 @@ Compare the installed PTF groups on IBM i against the fix repository by the meth
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `group_list`          | list          | groups will be checked.                                   |
-| `type`                | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. The default value is 'latest'.|
+| Variable                                            | Type          | Description                                               |
+|-----------------------------------------------------|---------------|-----------------------------------------------------------|
+| `check_ptf_groups_against_fix_repo_group_list`      | list          | groups will be checked.                                   |
+| `check_ptf_groups_against_fix_repo_type`            | string        | compare the ptf groups by level. Value can be 'current' or 'latest'. The default value is 'latest'.|
+| `check_ptf_groups_against_fix_repo_repo_server`     | string        | Repository server                                         |
 
 Return Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `group_status`        | list          | The list of group status information.                     |
+| Variable                                            | Type          | Description                                               |
+|-----------------------------------------------------|---------------|-----------------------------------------------------------|
+| `check_ptf_groups_against_fix_repo_group_status`    | list          | The list of group status information.                     |
 
 Example Playbook
 ----------------
@@ -25,13 +26,13 @@ Example Playbook
   hosts: ibmi
 
   vars:
-    group_list:
+    check_ptf_groups_against_fix_repo_group_list:
       - "SF99740"
       - "SF99665"
       - "SF99722"
       - "SF99704"
-    type: "current"
-    repo_server: "repo_server_name"
+    check_ptf_groups_against_fix_repo_type: "current"
+    check_ptf_groups_against_fix_repo_repo_server: "repo_server_name"
 
   tasks:
     - name: check ptf groups
@@ -40,7 +41,7 @@ Example Playbook
 
     - name: print groups status
       debug:
-        var: group_status
+        var: check_ptf_groups_against_fix_repo_group_status
 
 ```
 
@@ -51,7 +52,7 @@ The "latest" method contains the attributes of "LATEST_PTF_GROUP_LEVEL" and "CUR
 The "current" method only contains the attribute "CURRENT_PTF_GROUP_LEVEL".
 
 Example for type "latest":
-"group_status": [
+"check_ptf_groups_against_fix_repo_group_status": [
     # PTF group does not exist in fix repository
     {
         "PTF_GROUP_NUMBER": "SF99740",
@@ -97,7 +98,7 @@ Example for type "latest":
 ]
 
 Example for type "current":
-"group_status": [
+"check_ptf_groups_against_fix_repo_group_status": [
     # PTF group with a specific level does not exist in fix repository
     {
         "CURRENT_PTF_GROUP_LEVEL": 19340
