@@ -2,50 +2,50 @@
 # Tasks file for apply_ptfs
 - name: Initialize variables
   ansible.builtin.set_fact:
-    requisite_list: []
-    apply_fail_dict: {}
-    apply_fail_with_requisite_list: []
+    apply_ptf_requisite_list: []
+    apply_ptf_apply_fail_dict: {}
+    apply_ptf_apply_fail_with_requisite_list: []
 
 - name: Include tasks from apply_all_loaded_ptfs.yml
   ansible.builtin.include_tasks: apply_all_loaded_ptfs.yml
-  when: apply_all_loaded_ptfs
+  when: apply_ptf_apply_all_loaded_ptfs
 
 - name: Apply all loaded ptfs
-  when: not apply_all_loaded_ptfs
+  when: not apply_ptf_apply_all_loaded_ptfs
   block:
     - name: Initialize variables
       ansible.builtin.set_fact:
-        apply_success_list: []
-        apply_fail_list: []
+        apply_ptf_apply_success_list: []
+        apply_ptf_apply_fail_list: []
         ipl_requested: false
 
     - name: Apply ptfs
       ansible.builtin.include_tasks: apply_individual_ptf.yml
-      loop: "{{ to_be_applied_list }}"
+      loop: "{{ apply_ptf_to_be_applied_list }}"
       loop_control:
         loop_var: apply_ptf
       register: apply_result
 
-    - name: Reboot the system immediately if auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
+    - name: Reboot the system immediately if apply_ptf_auto_ipl is set to true and at least one to-be-applied PTF requires an IPL
       ibm.power_ibmi.ibmi_reboot:
-      when: auto_ipl and ipl_requested
+      when: apply_ptf_auto_ipl and ipl_requested
 
     - name: Print the successfully apply list
       ansible.builtin.debug:
-        var: apply_success_list
+        var: apply_ptf_apply_success_list
 
     - name: Print the fail apply list
       ansible.builtin.debug:
-        var: apply_fail_list
+        var: apply_ptf_apply_fail_list
 
-- name: Print apply_fail_with_requisite_list
+- name: Print apply_ptf_apply_fail_with_requisite_list
   ansible.builtin.debug:
-    var: apply_fail_with_requisite_list
+    var: apply_ptf_apply_fail_with_requisite_list
 
-- name: Print apply_fail_dict
+- name: Print apply_ptf_apply_fail_dict
   ansible.builtin.debug:
-    var: apply_fail_dict
+    var: apply_ptf_apply_fail_dict
 
-- name: Print requisite_list
+- name: Print apply_ptf_requisite_list
   ansible.builtin.debug:
-    var: requisite_list
+    var: apply_ptf_requisite_list

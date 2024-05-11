@@ -4,12 +4,13 @@
 
 - name: Compose image name
   ansible.builtin.set_fact:
-    image_name_to_be_created: '{{ image_name }}_{{ random_postfix }}'
+    image_name_to_be_created: '{{ capture_server_via_powervc_image_name }}_{{ random_postfix }}'
 
 - name: Create VM snapshot
   ansible.builtin.shell: . /opt/ibm/powervc/powervcrc  && nova --os-username={{ ansible_ssh_user }} --os-password={{ ansible_ssh_pass }}
-            --os-project-name={{ project }}  --os-project-domain-name={{ project_domain }} --os-user-domain-name={{ user_domain }}
-            image-create {{ vm_name }} {{ image_name_to_be_created }}
+            --os-project-name={{ capture_server_via_powervc_project }}  --os-project-domain-name={{ capture_server_via_powervc_project_domain }}
+            --os-user-domain-name={{ capture_server_via_powervc_user_domain }}
+            image-create {{ capture_server_via_powervc_vm_name }} {{ image_name_to_be_created }}
   register: image_create_result
   no_log: true
   changed_when: image_create_result.rc == 0
@@ -20,17 +21,17 @@
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
       password: '{{ ansible_ssh_pass }}'
-      project_name: '{{ project }}'
-      project_domain_name: '{{ project_domain }}'
-      user_domain_name: '{{ user_domain }}'
+      project_name: '{{ capture_server_via_powervc_project }}'
+      project_domain_name: '{{ capture_server_via_powervc_project_domain }}'
+      user_domain_name: '{{ capture_server_via_powervc_user_domain }}'
     image: '{{ image_name_to_be_created }}'
-    verify: '{{ verify_cert }}'
+    validate_certs: '{{ capture_server_via_powervc_validate_certs }}'
   register: image_info
 
-- name: Compose openstack_image
+- name: Compose capture_server_via_powervc_images_info
   ansible.builtin.set_fact:
-    openstack_image: '{{ image_info }}'
+    capture_server_via_powervc_image_info: '{{ image_info }}'
 
-- name: Display openstack_image
+- name: Display capture_server_via_powervc_images_info
   ansible.builtin.debug:
-    var: openstack_image
+    var: capture_server_via_powervc_image_info

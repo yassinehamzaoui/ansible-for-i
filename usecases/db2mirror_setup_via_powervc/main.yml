@@ -98,11 +98,12 @@
       ansible.builtin.include_role:
         name: display_vm_info_via_powervc
       vars:
-        vm_name: '{{ sourceVmNameOnPowerVC }}'
+        display_vm_info_via_powervc_vm_name: '{{ sourceVmNameOnPowerVC }}'
+        display_vm_info_via_powervc_validate_certs: '{{ verify_cert }}'
 
     - name: Find required parameters for present_ip_interface
       ansible.builtin.include_tasks: configure_ip.yml
-      loop: '{{vm_info_result.openstack_servers[0].addresses.values() | list | flatten(1)}}'
+      loop: '{{display_vm_info_via_powervc_vm_info_result.openstack_servers[0].addresses.values() | list | flatten(1)}}'
       loop_control:
         loop_var: network
 
@@ -136,8 +137,9 @@
       ansible.builtin.include_role:
         name: change_server_state_via_powervc
       vars:
-        vm_action: 'stop'
-        vm_name: '{{ sourceVmNameOnPowerVC }}'
+        change_server_state_via_powervc_vm_action: 'stop'
+        change_server_state_via_powervc_vm_name: '{{ sourceVmNameOnPowerVC }}'
+        change_server_state_via_powervc_validate_certs: '{{ verify_cert }}'
       when: cloneType | upper == 'COLD'
 
     ## Source setup finished. It is time to setup copy node.
@@ -145,8 +147,9 @@
       ansible.builtin.include_role:
         name: capture_server_via_powervc
       vars:
-        image_name: '{{ imageName }}'
-        vm_name: '{{ sourceVmNameOnPowerVC }}'
+        capture_server_via_powervc_image_name: '{{ imagename }}'
+        capture_server_via_powervc_vm_name: '{{ sourceVmNameOnPowerVC }}'
+        capture_server_via_powervc_validate_certs: '{{ verify_cert }}'
 
     - name: Set nic_list
       ansible.builtin.set_fact:
@@ -172,11 +175,13 @@
       ansible.builtin.include_role:
         name: deploy_vm_via_powervc
       vars:
-        vm_name: '{{ source_system_name.row[0]["HOST_NAME"] }}'
-        image_name_or_id: '{{ image_info.openstack_image.id }}'
-        deploy_userdata: '{{ userdata }}'
-        flavor_name_or_id: '{{ flavor }}'
-        availability_zone_name: '{{ availability_zone }}'
+        deploy_vm_via_powervc_vm_name: '{{ source_system_name.row[0]["HOST_NAME"] }}'
+        deploy_vm_via_powervc_image_name_or_id: '{{ capture_server_via_powervc_image_info.openstack_image.id }}'
+        deploy_vm_via_powervc_deploy_userdata: '{{ userdata }}'
+        deploy_vm_via_powervc_flavor_name_or_id: '{{ flavor }}'
+        deploy_vm_via_powervc_availability_zone_name: '{{ availability_zone }}'
+        deploy_vm_via_powervc_nic_list: '{{ nic_list }}'
+        deploy_vm_via_powervc_validate_certs: '{{ verify_cert }}'
 
     - name: Prepare warm clone on source node
       ibm.power_ibmi.ibmi_mirror_warm_clone_activity:
@@ -188,8 +193,9 @@
       ansible.builtin.include_role:
         name: change_server_state_via_powervc
       vars:
-        vm_action: 'start'
-        vm_name: '{{ sourceVmNameOnPowerVC }}'
+        change_server_state_via_powervc_vm_action: 'start'
+        change_server_state_via_powervc_vm_name: '{{ sourceVmNameOnPowerVC }}'
+        change_server_state_via_powervc_validate_certs: '{{ verify_cert }}'
       when: cloneType == 'COLD'
 
     - name: Add VM to Ansible in-memory inventory

@@ -5,9 +5,20 @@ Ansible role for retrieving port info and corresponding subnet info by mac addre
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                      |
-|-----------------------|---------------|--------------------------------------------------|
-| `mac_addr`      | str          | Required. The mac address of a port to be retrieved.                   |                  
+| Variable                                             | Type          | Description                                                            |
+|------------------------------------------------------|---------------|------------------------------------------------------------------------|
+| `display_network_info_via_powervc_mac_addr`          | dict          | Required. The mac address of a port to be retrieved.                   |
+| `display_network_info_via_powervc_project`           | str           | Optional. Default value is "ibm-default".                              |
+| `display_network_info_via_powervc_project_domain`    | str           | Optional. Default value is "Default".                                  |
+| `display_network_info_via_powervc_user_domain_name`  | str           | Optional. Default value is "Default".                                  |
+| `display_network_info_via_powervc_validate_certs`    | bool          | Optional. Default value is True.                                       |
+
+Return Variables
+--------------
+
+| Variable                                           | Type          | Description                                                       |
+|----------------------------------------------------|---------------|-------------------------------------------------------------------|
+| `display_network_info_via_powervc_interface_info`  | dict          | Dictionary with network interface information                     |
 
 Example Playbooks
 ----------------
@@ -18,13 +29,14 @@ Example Playbooks
     - include_role:
         name: display_network_info_via_powervc
       vars:
-        mac_addr: "fa:16:3e:cd:45:ee" 
+        display_network_info_via_powervc_mac_addr: "fa:16:3e:cd:45:ee"
+        display_network_info_via_powervc_validate_certs: false
 
 ```
 
 Example Output
 ----------------
-        "interface_info": {
+        "display_network_info_via_powervc_interface_info": {
             "fixed_ips": [
                 {
                     "ip_address": "11.11.11.21",

@@ -4,12 +4,12 @@
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
       password: '{{ ansible_ssh_pass }}'
-      project_name: '{{ project }}'
-      project_domain_name: '{{ project_domain }}'
-      user_domain_name: '{{ user_domain }}'
-    verify: false
+      project_name: '{{ display_network_info_via_powervc_project }}'
+      project_domain_name: '{{ display_network_info_via_powervc_project_domain }}'
+      user_domain_name: '{{ display_network_info_via_powervc_user_domain }}'
+    validate_certs: '{{ display_network_info_via_powervc_validate_certs }}'
     filters:
-      mac_address: "{{ mac_addr }}"
+      mac_address: "{{ display_network_info_via_powervc_mac_addr }}"
   register: port_info
 
 - name: Gather information about a previously created subnet by name
@@ -18,20 +18,20 @@
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
       password: '{{ ansible_ssh_pass }}'
-      project_name: '{{ project }}'
-      project_domain_name: '{{ project_domain }}'
-      user_domain_name: '{{ user_domain }}'
-    verify: false
+      project_name: '{{ display_network_info_via_powervc_project }}'
+      project_domain_name: '{{ display_network_info_via_powervc_project_domain }}'
+      user_domain_name: '{{ display_network_info_via_powervc_user_domain }}'
+    validate_certs: '{{ display_network_info_via_powervc_validate_certs }}'
     name: '{{  fixed_ip.subnet_id  }}'
   register: subnet_info
   loop: '{{  port_info.openstack_ports[0].fixed_ips  }}'
   loop_control:
     loop_var: fixed_ip
 
-- name: Compose interface_info
+- name: Compose display_network_info_via_powervc_interface_info
   ansible.builtin.set_fact:
-    interface_info: >
-      {'fixed_ips': '{{ port_info.openstack_ports[0].fixed_ips }}', \
-      'mac_addr': "{{ mac_addr }}", \
-      'subnet': "{{  subnet_info.results | \
-      map(attribute='openstack_subnets')|join(', ') }}"}
+    display_network_info_via_powervc_interface_info:
+      {'fixed_ips': '{{ port_info.openstack_ports[0].fixed_ips }}',
+       'mac_addr': "{{ display_network_info_via_powervc_mac_addr }}",
+       'subnet': "{{  subnet_info.results |
+        map(attribute='openstack_subnets')|join(', ') }}"}

@@ -3,35 +3,35 @@
 ##################################
 ##     IP interface varaibles   ##
 ##################################
-vlanid: '*NONE'
-associatedLocalInterface: '*NONE'
+present_ip_interface_vlanid: '*NONE'
+present_ip_interface_associated_local_interface: '*NONE'
 # type_of_service: '*NORMAL'
-typeOfService: '*NORMAL'
-maxTransmissionUnit: '*LIND'
-autoStart: '*YES'
-preferredInterface: '*NONE'
-textDescription: '*BLANK'
-secToWait: 0
-extraParams: ''
-# line_description: ''
+present_ip_interface_type_of_service: '*NORMAL'
+present_ip_interface_max_transmission_unit: '*LIND'
+present_ip_interface_auto_start: '*YES'
+present_ip_interface_preferred_interface: '*NONE'
+present_ip_interface_text_description: '*BLANK'
+present_ip_interface_sec_to_wait: 0
+present_ip_interface_extra_params: ''
+# present_ip_interface_line_description: ''
 
 ##################################
 ## Line description varaibles   ##
 ##################################
-location_code_of_ethernet_port: ''
-resource_name_of_ethernet_port: ''
-mac_address_of_ethernet_port: ''
+present_ip_interface_location_code_of_ethernet_port: ''
+present_ip_interface_resource_name_of_ethernet_port: ''
+present_ip_interface_mac_address_of_ethernet_port: ''
 # By default the command to create a line description only has two options: LIND and RSRCNAME.
 # For example, CRTLINETH LIND(ETHLINE) RSRCNAME(CMN03)
-addition_options_for_CRTLINETH: ''
+present_ip_interface_addition_options_for_crtlineth: ''
 
 ##################################
 ##       Route varaibles        ##
 ##################################
-route_destination: '*DFTROUTE'
-next_hop: ''
+present_ip_interface_route_destination: '*DFTROUTE'
+present_ip_interface_next_hop: ''
 # By default the command to add routes only has two options: RTEDEST and NEXTHOP.
 # For example, ADDTCPRTE RTEDEST(*DFTROUTE) NEXTHOP('9.123.97.1').
-# If addtions are required, define them in addition_options_for_CRTLINETH.
-# For example addition_options_for_ADDTCPRTE: 'SUBNETMASK(*NONE) TOS(*MINCOST) MTU(*IFC)'
-addition_options_for_ADDTCPRTE: ' '
+# If addtions are required, define them in present_ip_interface_addition_options_for_crtlineth.
+# For example present_ip_interface_addition_options_for_addtcprte: 'SUBNETMASK(*NONE) TOS(*MINCOST) MTU(*IFC)'
+present_ip_interface_addition_options_for_addtcprte: ' '

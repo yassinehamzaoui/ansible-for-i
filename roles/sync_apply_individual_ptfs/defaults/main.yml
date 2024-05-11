@@ -1,5 +1,9 @@
 ---
 # Default values for sync_apply_individual_ptfs
-dest: "/qsys.lib/qgpl.lib"
-already_loaded_list: []
-delete: true
+sync_apply_individual_ptfs_dest: "/qsys.lib/qgpl.lib"
+sync_apply_individual_ptfs_already_loaded_list: []
+sync_apply_individual_ptfs_delete: true
+sync_apply_individual_ptfs_apply_all_loaded_ptf: true
+sync_apply_individual_ptfs_temp_or_perm: '*TEMP'
+sync_apply_individual_ptfs_delayed_option: '*IMMDLY'
+sync_apply_individual_ptfs_auto_ipl: false

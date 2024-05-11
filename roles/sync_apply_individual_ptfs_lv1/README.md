@@ -5,20 +5,24 @@ Call ibmi_synchronize_files modules to transfer a list of exists ptfs install fi
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                                      |
-|-----------------------|---------------|----------------------------------------------------------------------------------|
-| `not_loaded_list`      | list          | The not loaded ptfs' information list. ptf_id, product, file_name and file_path are required.  |
-| `already_loaded_list`    | list        | The already loaded ptfs' information list. ptf_id and product are required.  |
-| `src_host`            | str           | The system that has the ptf install files, which will be transferred to the target system.|
-| `delete`              | bool          | Whether or not to delete the PTF install files after apply. The default is True.  |
+| Variable                                              | Type          | Description                                                                      |
+|-------------------------------------------------------|---------------|----------------------------------------------------------------------------------|
+| `sync_apply_individual_ptfs_lv1_not_loaded_list`      | list          | The not loaded ptfs' information list. ptf_id, product, file_name and file_path are required.  |
+| `sync_apply_individual_ptfs_lv1_already_loaded_list`  | list          | The already loaded ptfs' information list. ptf_id and product are required.  |
+| `sync_apply_individual_ptfs_lv1_src_host`             | str           | The system that has the ptf install files, which will be transferred to the target system.|
+| `sync_apply_individual_ptfs_lv1_delete`               | bool          | Whether or not to delete the PTF install files after apply. The default is True.  |
+| `sync_apply_individual_ptfs_v1_apply_all_loaded_ptf`  | bool          | Used by apply_ptf role. Used by apply_ptf role. Controls whether all loaded ptf will be applied. When the value is true, 'to_be_applied_list' will be ignored. The default value is True.    |
+| `sync_apply_individual_ptfs_v1_temp_or_perm`          | str           | Used by apply_ptf role. Controls whether the target PTFs will be permanent applied or temporary applied. Value can be  '*TEMP' or '*PERM'. Default value is '*TEMP'.                     |
+| `sync_apply_individual_ptfs_v1_delayed_option`        | str           | Used by apply_ptf role. Controls whether the PTF is delayed apply or not. Value can be '*YES', '*NO' or '*IMMDLY'. Default value is '*IMMDLY'.                      |
+| `sync_apply_individual_ptfs_v1_auto_ipl`              | bool          | Used by apply_ptf role. Controls whether an immediate reboot will be launched automatically if at least one ptf requests an IPL for permanent applied or temporary applied. The default value is false. |
 
 Return Variables
 --------------
 
-| Variable              | Type          | Description                   |
-|-----------------------|---------------|-------------------------------|
-| `apply_fail_list`   | list          | The list of the failed apply.  |
-| `apply_success_list`      | list          | The list of the successful apply.      |
+| Variable                                            | Type          | Description                   |
+|-----------------------------------------------------|---------------|-------------------------------|
+| `sync_apply_individual_ptfs_lv1_apply_fail_list`    | list          | The list of the failed apply.  |
+| `sync_apply_individual_ptfs_lv1_apply_success_list` | list          | The list of the successful apply.      |
 
 Example Playbook
 ----------------
@@ -27,11 +31,11 @@ Example Playbook
   hosts: desthost
 
   vars:
-    src_host: "srchost"
-    not_loaded_list:
+    sync_apply_individual_ptfs_lv1_src_host: "srchost"
+    sync_apply_individual_ptfs_lv1_not_loaded_list:
       - {'ptf_id':'SI75995', 'product':'5733SC1', 'release': 'V7R2M0', 'file_path': '/home/test/PTF/singleptf/SI75995'}
       - {'ptf_id':'SI63556', 'product':'5770UME', 'release': 'V1R4M0', 'file_path': '/home/test/PTF/singleptf/SI63556'}
-    already_loaded_list:
+    sync_apply_individual_ptfs_lv1_already_loaded_list:
       - {'ptf_id':'SI77217', 'product':'5770UME'}
 
   tasks:
@@ -44,12 +48,12 @@ Example Returned Variables
 ----------------
 ```
 
-"apply_success_list": [
+"sync_apply_individual_ptfs_lv1_apply_success_list": [
         "SI75995",
         "SI77217"
     ]
 
-"apply_fail_list": [
+"sync_apply_individual_ptfs_lv1_apply_fail_list": [
         "SI63556"
     ]
 

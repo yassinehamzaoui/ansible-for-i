@@ -1,54 +1,61 @@
 # negative test of the role check_ptf_groups_against_fix_repo
-- set_fact:
-    repo_server_name: "ut2026p8.rch.stglabs.ibm.com"
 
 - block:
+  - name: Add repo server VM to Ansible in-memory inventory
+    add_host:
+      name: "repo_server_name"
+      ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+      ansible_user: tester
+      groups: ibmi
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
   - name: invalid group_list
     include_role:
       name: check_ptf_groups_against_fix_repo
     vars: 
-      group_list:
+      check_ptf_groups_against_fix_repo_group_list:
         - "INVALID"
         - "SF12345"
-      type: "latest"
-      repo_server: "{{repo_server_name}}"
+      check_ptf_groups_against_fix_repo_type: "latest"
+      check_ptf_groups_against_fix_repo_repo_server: repo_server_name
 
   - name: assert the returned group_status
     assert:
       that:
-        - group_status | length == 2
-        - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-        - group_status[1]['LATEST_PTF_GROUP_LEVEL'] is not defined
-        - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
-        - group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
+        - check_ptf_groups_against_fix_repo_group_status | length == 2
+        - check_ptf_groups_against_fix_repo_group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[1]['LATEST_PTF_GROUP_LEVEL'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
+        - check_ptf_groups_against_fix_repo_group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
 
   - name: invalid type
     ignore_errors: true
     import_role:
       name: check_ptf_groups_against_fix_repo
     vars: 
-      group_list:
+      check_ptf_groups_against_fix_repo_group_list:
         - "SF99704"
-      type: "newest"
-      repo_server: "{{repo_server_name}}"
+      check_ptf_groups_against_fix_repo_type: "newest"
+      check_ptf_groups_against_fix_repo_repo_server: repo_server_name
 
   - name: assert the returned group_status
     assert:
       that:
-        - group_status | length == 0
-        - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-        - group_status[0]['PTF_GROUP_NUMBER'] is not defined
-        - group_status[0]['PTF_GROUP_STATUS'] is not defined
-        - group_status[0]['PTF_NOT_INSTALLED'] is not defined  
+        - check_ptf_groups_against_fix_repo_group_status | length == 0
+        - check_ptf_groups_against_fix_repo_group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_NUMBER'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_STATUS'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_NOT_INSTALLED'] is not defined  
 
   - name: assert the returned group_status
     assert:
       that:
-        - group_status | length == 0
-        - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-        - group_status[0]['PTF_GROUP_NUMBER'] is not defined
-        - group_status[0]['PTF_GROUP_STATUS'] is not defined
-        - group_status[0]['PTF_NOT_INSTALLED'] is not defined   
+        - check_ptf_groups_against_fix_repo_group_status | length == 0
+        - check_ptf_groups_against_fix_repo_group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_NUMBER'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_STATUS'] is not defined
+        - check_ptf_groups_against_fix_repo_group_status[0]['PTF_NOT_INSTALLED'] is not defined   
 
 - block:
   - set_fact:
@@ -65,9 +72,9 @@
   - name: assert the returned parameters
     assert:
       that:
-        - ptfs_info == []
-        - not_loaded_ptfs_list == []
-        - ptfs_status == {}
+        - check_ptf_ptfs_info == []
+        - check_ptf_not_loaded_ptfs_list == []
+        - check_ptf_ptfs_status == {}
 
 # negative test of the role load_ptf
 
@@ -82,13 +89,14 @@
     import_role:
       name: load_ptf
     vars: 
-      to_be_loaded_list: '{{neg_list}}'
+      load_ptf_to_be_loaded_list: '{{neg_list}}'
 
   - name: assert the returned list correct
     assert:
       that:
-        - load_fail_list == neg_list
-        - load_success_list == []    
+        - load_ptf_load_fail_list == neg_list
+        - load_ptf_load_success_list == []
+        - load_ptf_load_fail_dict is defined
 
 # # negative test of the role apply_ptf
 
@@ -102,65 +110,65 @@
     include_role:
       name: apply_ptf
     vars: 
-      to_be_applied_list: '{{neg_list}}'
-      apply_all_loaded_ptfs: false
+      apply_ptf_to_be_applied_list: '{{neg_list}}'
+      apply_ptf_apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list == neg_list
-        - apply_success_list == []      
+        - apply_ptf_apply_fail_list == neg_list
+        - apply_ptf_apply_success_list == []
   
-  - name: negative testing on other options - temp_or_perm
+  - name: negative testing on other options - apply_ptf_temp_or_perm
     include_role:    
       name: apply_ptf
     vars:
-      to_be_applied_list:
+      apply_ptf_to_be_applied_list:
         - {'ptf_id':'SI73543', 'product':'5770UME'}
-      temp_or_perm: '*TAMP' # invalid option
-      delayed_option: '*NO' 
-      auto_ipl: false     
-      apply_all_loaded_ptfs: false
+      apply_ptf_temp_or_perm: '*TAMP' # invalid option
+      apply_ptf_delayed_option: '*NO' 
+      apply_ptf_auto_ipl: false     
+      apply_ptf_apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list | length == 1 
-        - apply_success_list == []
+        - apply_ptf_apply_fail_list | length == 1 
+        - apply_ptf_apply_success_list == []
 
-  - name: negative testing on other options - delayed_option
+  - name: negative testing on other options - apply_ptf_delayed_option
     include_role:    
       name: apply_ptf
     vars:
-      to_be_applied_list:
+      apply_ptf_to_be_applied_list:
         - {'ptf_id':'SI73543', 'product':'5770UME'}
-      temp_or_perm: '*TEMP'
-      delayed_option: false # invalid option 
-      auto_ipl: false    
-      apply_all_loaded_ptfs: false 
+      apply_ptf_temp_or_perm: '*TEMP'
+      apply_ptf_delayed_option: false # invalid option 
+      apply_ptf_auto_ipl: false    
+      apply_ptf_apply_all_loaded_ptfs: false 
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list | length == 1 
-        - apply_success_list == []    
+        - apply_ptf_apply_fail_list | length == 1 
+        - apply_ptf_apply_success_list == []    
 
-  - name: negative testing on other options - auto_ipl
+  - name: negative testing on other options - apply_ptf_auto_ipl
     include_role:    
       name: apply_ptf
     vars:
-      to_be_applied_list:
+      apply_ptf_to_be_applied_list:
         - {'ptf_id':'SI73543', 'product':'5770UME'}
-      temp_or_perm: '*TEMP'
-      delayed_option: '*NO' 
-      auto_ipl: '*NO'   # invalid option   
-      apply_all_loaded_ptfs: false
+      apply_ptf_temp_or_perm: '*TEMP'
+      apply_ptf_delayed_option: '*NO' 
+      apply_ptf_auto_ipl: '*NO'   # invalid option   
+      apply_ptf_apply_all_loaded_ptfs: false
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list | length == 1 
-        - apply_success_list == []  
+        - apply_ptf_apply_fail_list | length == 1 
+        - apply_ptf_apply_success_list == []  
 
   - name: apply a PTF which is already applied on system - find a PTF which is *PERM applied
     ibmi_sql_query:
@@ -171,19 +179,19 @@
     include_role:    
       name: apply_ptf
     vars:
-      to_be_applied_list:
+      apply_ptf_to_be_applied_list:
         - {'ptf_id':"{{sql_query['row'][0]['PTF_IDENTIFIER']}}", 'product':"{{sql_query['row'][0]['PTF_PRODUCT_ID']}}"}
-      temp_or_perm: '*PERM'
-      delayed_option: '*NO' 
-      auto_ipl: false
-      apply_all_loaded_ptfs: false
+      apply_ptf_temp_or_perm: '*PERM'
+      apply_ptf_delayed_option: '*NO' 
+      apply_ptf_auto_ipl: false
+      apply_ptf_apply_all_loaded_ptfs: false
     when: sql_query.row_count >= 1 
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list | length == 1
-        - apply_success_list == []    
+        - apply_ptf_apply_fail_list | length == 1
+        - apply_ptf_apply_success_list == []
     
   - name: apply a PTF which is not loaded on system - find a non-loaded PTF on system
     ibmi_sql_query:
@@ -194,16 +202,16 @@
     include_role:    
       name: apply_ptf
     vars:
-      to_be_applied_list:
+      apply_ptf_to_be_applied_list:
         - {'ptf_id':"{{sql_query['row'][0]['PTF_IDENTIFIER']}}", 'product':"{{sql_query['row'][0]['PTF_PRODUCT_ID']}}"}
-      temp_or_perm: '*TEMP'
-      delayed_option: '*NO' 
-      auto_ipl: false
-      apply_all_loaded_ptfs: false
+      apply_ptf_temp_or_perm: '*TEMP'
+      apply_ptf_delayed_option: '*NO' 
+      apply_ptf_auto_ipl: false
+      apply_ptf_apply_all_loaded_ptfs: false
     when: sql_query.row_count >= 1    
 
   - name: assert the returned list correct
     assert:
       that:
-        - apply_fail_list | length == 1
-        - apply_success_list == []     
+        - apply_ptf_apply_fail_list | length == 1
+        - apply_ptf_apply_success_list == []     

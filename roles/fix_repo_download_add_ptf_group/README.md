@@ -5,17 +5,17 @@ Call ibmi_download_fix module to download ptf group, then call ibmi_fix_repo mod
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                          |
-|-----------------------|---------------|----------------------------------------------------------------------|
-| `ptf_group_info`    | str           | The ptf group information. ptf_group_number, ptf_group_level, release, release_date, ptf_list and description are required.        |
+| Variable                                           | Type          | Description                                                          |
+|----------------------------------------------------|---------------|----------------------------------------------------------------------|
+| `fix_repo_download_add_ptf_group_ptf_group_info`   | str           | The ptf group information. ptf_group_number, ptf_group_level, release, release_date, ptf_list and description are required.        |
 
 Return Variables
 --------------
 
-| Variable                      | Type          | Description                                                                                    |
-|-------------------------------|---------------|------------------------------------------------------------------------------------------------|
-| `download_fix_result`         | dict          | ibmi_download_fix module returned result                                                       |
-| `download_status_add_result`  | dict          | ibmi_fix_repo module returned result of added ptf group's information in download_status table.|
+| Variable                                                     | Type          | Description                                                                                    |
+|--------------------------------------------------------------|---------------|------------------------------------------------------------------------------------------------|
+| `fix_repo_download_add_ptf_group_download_fix_result`        | dict          | ibmi_download_fix module returned result                                                       |
+| `fix_repo_download_add_ptf_group_download_status_add_result` | dict          | ibmi_fix_repo module returned result of added ptf group's information in download_status table.|
 
 Example Playbook
 ----------------
@@ -24,7 +24,7 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_info: {
+    fix_repo_download_add_ptf_group_ptf_group_info: {
         "description": "SF99704 740 DB2 for IBM i",
         "ptf_group_level": 11,
         "ptf_group_number": "SF99704",

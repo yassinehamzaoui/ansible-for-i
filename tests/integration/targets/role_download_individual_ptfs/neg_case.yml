@@ -6,18 +6,20 @@
   include_role:
     name: download_individual_ptfs
   vars:
-    to_be_downloaded_list:
+    download_individual_ptfs_to_be_downloaded_list:
       - {'ptf_id': "{{neg_ptfs[0]}}"}
       - {'ptf_id': "{{neg_ptfs[1]}}"}
-    order: '*PTFID'
-    download_server: "ut2026p8.rch.stglabs.ibm.com"
+    download_individual_ptfs_order: '*PTFID'
+    download_individual_ptfs_download_server: "ut2026p8.rch.stglabs.ibm.com"
 
 - name: assert values
   assert:
     that:
-      - download_success_list | length == 0
-      - download_fail_list | length == 2
-      - download_fail_list[0]['ptf_id'] == "{{neg_ptfs[0]}}"
-      - download_fail_list[1]['ptf_id'] == "{{neg_ptfs[1]}}"
-      - download_fail_list[0]['fail_reason'] == "PTF *ONLYPRD-{{neg_ptfs[0]}} *ONLYRLS not available on the service provider system."      
-      - download_fail_list[1]['fail_reason'] == "Submit job failed."    
+      - download_individual_ptfs_download_success_list is defined
+      - download_individual_ptfs_download_fail_list is defined
+      - download_individual_ptfs_download_success_list | length == 0
+      - download_individual_ptfs_download_fail_list | length == 2
+      - download_individual_ptfs_download_fail_list[0]['ptf_id'] == "{{neg_ptfs[0]}}"
+      - download_individual_ptfs_download_fail_list[1]['ptf_id'] == "{{neg_ptfs[1]}}"
+      - download_individual_ptfs_download_fail_list[0]['fail_reason'] == "PTF *ONLYPRD-{{neg_ptfs[0]}} *ONLYRLS not available on the service provider system."      
+      - download_individual_ptfs_download_fail_list[1]['fail_reason'] == "Submit job failed."    

@@ -3,17 +3,18 @@
 - name: Involve ibm.power_ibmi.ibmi_download_fix to download ptfs
   ibm.power_ibmi.ibmi_download_fix:
     ptf_id: "{{ download_ptf.ptf_id }}"
-    order: "{{ order_default | default('*PTFID') }}"
+    order: "{{ download_individual_ptfs_order }}"
   register: download_result
-  delegate_to: "{{ download_server }}"
+  delegate_to: "{{ download_individual_ptfs_download_server }}"
   ignore_errors: true
 
 - name: Compose successful list
   ansible.builtin.set_fact:
-    download_success_list: "{{ download_success_list | default([]) + download_result.download_list }}"
+    download_individual_ptfs_download_success_list: "{{ download_individual_ptfs_download_success_list | default([]) + download_result.download_list }}"
   when: download_result.download_list != []
 
 - name: Compose failed list
   ansible.builtin.set_fact:
-    download_fail_list: "{{ download_fail_list | default([]) + [ {'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg} ] }}"
+    download_individual_ptfs_download_fail_list: "{{ download_individual_ptfs_download_fail_list | default([]) +
+      [ {'ptf_id': download_ptf.ptf_id, 'fail_reason': download_result.msg} ] }}"
   when: download_result.failed or download_result.download_list == []

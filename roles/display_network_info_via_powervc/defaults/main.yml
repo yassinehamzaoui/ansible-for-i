@@ -2,7 +2,7 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 ---
 # Default values for display_network_info_via_powervc
-project: ibm-default
-project_domain: Default
-user_domain: Default
-verify_cert: true
+display_network_info_via_powervc_project: ibm-default
+display_network_info_via_powervc_project_domain: Default
+display_network_info_via_powervc_user_domain: Default
+display_network_info_via_powervc_validate_certs: true

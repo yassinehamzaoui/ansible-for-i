@@ -84,8 +84,8 @@
         import_role:
           name: configure_passwordless_ssh_login
         vars:
-          target_user: '{{cuser}}'
-          public_key: '{{public_key_content}}'
+          configure_passwordless_ssh_login_target_user: '{{cuser}}'
+          configure_passwordless_ssh_login_public_key: '{{public_key_content}}'
     when: key_state.stat.exists == false
     run_once: true
 

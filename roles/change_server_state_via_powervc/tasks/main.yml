@@ -1,14 +1,14 @@
 - name: Change VM state
   openstack.cloud.server_action:
-    action: '{{ vm_action }}'
+    action: '{{ change_server_state_via_powervc_vm_action }}'
     auth:
       auth_url: https://{{ ansible_ssh_host }}:5000/v3
       username: '{{ ansible_ssh_user }}'
       password: '{{ ansible_ssh_pass }}'
-      project_name: '{{ project }}'
-      project_domain_name: '{{ project_domain }}'
-      user_domain_name: '{{ user_domain }}'
-    verify: '{{ verify_cert }}'
-    server: '{{ vm_name }}'
-    timeout: '{{ change_state_timeout }}'
-  register: os_server_result
+      project_name: '{{ change_server_state_via_powervc_project }}'
+      project_domain_name: '{{ change_server_state_via_powervc_project_domain }}'
+      user_domain_name: '{{ change_server_state_via_powervc_user_domain }}'
+    validate_certs: '{{ change_server_state_via_powervc_validate_certs }}'
+    server: '{{ change_server_state_via_powervc_vm_name }}'
+    timeout: '{{ change_server_state_via_powervc_change_state_timeout }}'
+  register: change_server_state_via_powervc_server_result

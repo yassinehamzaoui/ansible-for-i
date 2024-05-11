@@ -5,19 +5,17 @@
   # The playbook file is to provide an example about how to query all PTFs requring IPL to  be applied or removed, then IPL system per required.
 
 # Parameters:
-  # auto_ipl --  Specifies if an IPL is launched automatically when there is/are PTF(s) requiring IPL to be applied or removed.
+  # auto_ipl      -- Specifies if an IPL is launched automatically when there is/are PTF(s) requiring IPL to be applied or removed.
   # target_system -- Specifies the target IBM i system name which is defined in hosts.ini.
   # All options supported by ibmi_reboot.
 
-# Command example: 
+# Command example:
   # ansible-playbook ./ipl_system_to_conduct_ipl_action_of_ptfs.yml -e "{'target_system': 'systemA'}"
 ---
 # tasks file for ipl_system_to_conduct_ipl_action_of_ptfs
-
-- hosts: '{{ target_system }}'
+- name: Playbook to query on PTFs to determine if any require an IPL and if so, then perform the IPL
+  hosts: '{{ target_system | default([]) }}'
   gather_facts: false
-  collections:
-    - ibm.power_ibmi
 
   vars:
     auto_ipl: false
@@ -38,33 +36,36 @@
   tasks:
 
     - name: Query the list of ptfs which requires an IPL
-      ibmi_sql_query:
+      ibm.power_ibmi.ibmi_sql_query:
         sql: "SELECT PTF_IDENTIFIER, PTF_PRODUCT_ID, PTF_IPL_ACTION, A.*
         FROM QSYS2.PTF_INFO A
         WHERE PTF_IPL_ACTION <> 'NONE'"
       register: query_ptf_result
 
     - name: Debug msg
-      debug:
+      ansible.builtin.debug:
         msg: 'No PTFs require an IPL.'
       when: query_ptf_result.row | length == 0
 
-    - block:
+    - name: Loop over PTF list if any require an iPL
+      when: query_ptf_result.row | length > 0
+      block:
         - name: Display ptf list which require an IPL
-          debug: var=query_ptf_result.row
+          ansible.builtin.debug:
+            var: query_ptf_result.row
 
         - name: Debug msg
-          debug:
+          ansible.builtin.debug:
             msg: 'At least one PTF requires an IPL, but auto_ipl is false. Please IPL the system manually.'
           when: not auto_ipl
 
         - name: Debug msg
-          debug:
+          ansible.builtin.debug:
             msg: 'At least one PTF requires an IPL and auto_ipl is true. The system is going to be IPLed soon.'
           when: auto_ipl | bool
 
         - name: Reboot the system immediately if auto_ipl is set to true and at least one PTF requires an IPL
-          ibmi_reboot:
+          ibm.power_ibmi.ibmi_reboot:
             pre_reboot_delay: '{{ pre_reboot_delay }}'
             post_reboot_delay: '{{ post_reboot_delay }}'
             reboot_timeout: '{{ reboot_timeout }}'
@@ -78,4 +79,3 @@
             end_subsystem_option: '{{ end_subsystem_option }}'
             timeout_option: '{{ timeout_option }}'
           when: auto_ipl | bool
-      when: query_ptf_result.row | length > 0

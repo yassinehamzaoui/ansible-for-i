@@ -1,36 +1,36 @@
 # negative test of the role
-- name: invalid group_list
+- name: Invalid group_list
   include_role:
     name: check_ptf_groups_against_fix_repo
   vars: 
-    group_list:
+    check_ptf_groups_against_fix_repo_group_list:
       - "INVALID"
       - "SF12345"
-    type: "latest"
-    repo_server: "repo_server_name"
+    check_ptf_groups_against_fix_repo_type: "latest"
+    check_ptf_groups_against_fix_repo_repo_server: "repo_server_name"
 
-- name: assert the returned group_status
+- name: Assert the returned check_ptf_groups_against_fix_repo_group_status
   assert:
     that:
-      - group_status | length == 2
-      - group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
-      - group_status[1]['LATEST_PTF_GROUP_LEVEL'] is not defined
-      - group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
-      - group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
+      - check_ptf_groups_against_fix_repo_group_status | length == 2
+      - check_ptf_groups_against_fix_repo_group_status[0]['LATEST_PTF_GROUP_LEVEL'] is not defined
+      - check_ptf_groups_against_fix_repo_group_status[1]['LATEST_PTF_GROUP_LEVEL'] is not defined
+      - check_ptf_groups_against_fix_repo_group_status[0]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
+      - check_ptf_groups_against_fix_repo_group_status[1]['PTF_GROUP_STATUS'] == 'Record not found in repository DB'
 
 - block:
-  - name: invalid type
+  - name: Invalid type
     include_role:
       name: check_ptf_groups_against_fix_repo
     vars: 
-      group_list:
+      check_ptf_groups_against_fix_repo_group_list:
         - "{{group_name}}"
-      type: "newest"
-      repo_server: "repo_server_name"
+      check_ptf_groups_against_fix_repo_type: "newest"
+      check_ptf_groups_against_fix_repo_repo_server: "repo_server_name"
 
-  - name: assert the returned group_status
+  - name: Assert the returned check_ptf_groups_against_fix_repo_group_status
     assert:
       that:
-        - group_status == []
+        - check_ptf_groups_against_fix_repo_group_status == []
   ignore_errors: true
      

@@ -2,44 +2,46 @@
 # Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
 
 # Description:
-  # This playbook will Check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write
+  # This playbook will check if requested individual PTFs are already in catalog. If not, will download non-existent PTFs and write
   # information into catalog. After that, will transfer savfs to target server, then load and apply PTFs.
 
 # Parameters:
-  # repo_server -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
+  # repo_server   -- The IBM i server which can use SNDPTFORD to download and store PTF and PTF group install files.
   # target_system -- The target IBM i server that receives and applies the PTFs.
-  # ptfs_list -- The PTF number list which needs to be applied. 
-  
-# Command example: ansible-playbook ./download_apply_individual_ptfs.yml -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
+  # ptfs_list     -- The PTF number list which needs to be applied.
+
+# Command example: ansible-playbook ./download_apply_individual_ptfs.yml
+#                      -e "{'target_system': 'systemA', 'repo_server': 'reposerver', 'ptfs_list': ['SI67856', 'SI69375', 'SI73751']}"
 ---
 - name: Download and apply a list of individual ptfs
-  hosts: "{{ target_system }}"
+  hosts: "{{ target_system | default([]) }}"
   gather_facts: false
-  collections:
-   - ibm.power_ibmi
 
   vars:
-   ptfs_list_parm: "{{ ptfs_list }}"
-   repo_server: "{{ repo_server }}"
+   fix_repo_download_apply_individual_ptfs_ptfs_list_parm: "{{ ptfs_list }}"
+   fix_repo_download_apply_individual_ptfs_repo_server: "{{ repo_server }}"
    final_ptfs_status: {}
 
   tasks:
-   - block:
+   - name: Print PTF list information
+     when: fix_repo_download_apply_individual_ptfs_ptfs_list_parm == []
+     block:
       - name: Print msg
-        debug:
+        ansible.builtin.debug:
          msg: "ptfs_list is []. quit."
       - name: Quit when ptfs_list is []
-        meta: end_host
-     when: ptfs_list_parm == []
+        ansible.builtin.meta: end_host
 
    - name: Include fix_repo_download_apply_individual_ptfs role to download and apply a list of individual ptfs
-     include_role:
+     ansible.builtin.include_role:
       name: fix_repo_download_apply_individual_ptfs
+     # Try all PTFs even if an error occurs
      ignore_errors: true
+     register: fix_repo_download_apply_individual_ptfs_ignore_errors
      loop: "{{ query('sequence', 'start=1 end=5') }}"
      loop_control:
       loop_var: sequence_var
 
-   - name: fail condition
-     fail:
+   - name: Fail condition
+     ansible.builtin.fail:
       msg: "Loop already 5 times. quit."

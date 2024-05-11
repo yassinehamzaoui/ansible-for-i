@@ -6,17 +6,17 @@ Compare the PTF status with specific product id on IBM i against fix repository,
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `product`             | string        | the product of PTFs will be checked.                      |
-| `repo_server`         | string        | repository server name registered in inventory.           |
+| Variable                                              | Type          | Description                                               |
+|-------------------------------------------------------|---------------|-----------------------------------------------------------|
+| `check_ptfs_by_product_against_fix_repo_product`      | string        | the product of PTFs will be checked.                      |
+| `check_ptfs_by_product_against_fix_repo_repo_server`  | string        | repository server name registered in inventory.           |
 
 Return Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `ptf_status`          | list          | The list of PTF status.                                   |
+| Variable                                              | Type          | Description                                               |
+|-------------------------------------------------------|---------------|-----------------------------------------------------------|
+| `check_ptfs_by_product_against_fix_repo_ptf_status`   | list          | The list of PTF status.                                   |
 
 Example Playbook
 ----------------
@@ -25,8 +25,8 @@ Example Playbook
   hosts: ibmi
 
   vars:
-    product: "5770SS1"
-    repo_server: "repo_server_name"
+    check_ptfs_by_product_against_fix_repo_product: "5770SS1"
+    check_ptfs_by_product_against_fix_repo_repo_server: "repo_server_name"
 
   tasks:
     - name: check product ptf
@@ -35,14 +35,14 @@ Example Playbook
 
     - name: print ptfs status
       debug:
-        var: ptf_status
+        var: check_ptfs_by_product_against_fix_ptf_status
 
 ```
 
 Return Value Example
 ----------------
 ```
-"ptf_status": [
+"check_ptfs_by_product_against_fix_repo_ptf_status": [
     {
         "PRODUCT": "5770SS1",
         "PRODUCT_STATUS": "OK",

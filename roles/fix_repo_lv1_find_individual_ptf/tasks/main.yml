@@ -2,14 +2,14 @@
 # Tasks file for fix_repo_lv1_find_individual_ptf
 - name: Init varibles
   ansible.builtin.set_fact:
-    ptf_find_result: []
-    ptf_fail_list: []
-    ptf_success_list: []
+    fix_repo_lv1_find_individual_ptf_ptf_find_result: []
+    fix_repo_lv1_find_individual_ptf_ptf_fail_list: []
+    fix_repo_lv1_find_individual_ptf_ptf_success_list: []
 
 - name: Compose ptf input list
   ansible.builtin.set_fact:
     list: "{{ list|default([]) + [{'ptf': item }] }}"
-  loop: "{{ ptfs_list }}"
+  loop: "{{ fix_repo_lv1_find_individual_ptf_ptfs_list }}"
 
 - name: Print PTF list
   ansible.builtin.debug:
@@ -23,12 +23,12 @@
 
 - name: Print ptf_find_result
   ansible.builtin.debug:
-    var: ptf_find_result
+    var: fix_repo_lv1_find_individual_ptf_ptf_find_result
 
 - name: Print ptf_fail_list
   ansible.builtin.debug:
-    var: ptf_fail_list
+    var: fix_repo_lv1_find_individual_ptf_ptf_fail_list
 
 - name: Print ptf_success_list
   ansible.builtin.debug:
-    var: ptf_success_list
+    var: fix_repo_lv1_find_individual_ptf_ptf_success_list

@@ -6,21 +6,20 @@ This role will setup network install env on repo server and use network install 
 Role Variables
 --------------
 
-| Variable              | Type          | Description                                                        |
-|-----------------------|---------------|--------------------------------------------------------------------|
-| `ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
+| Variable                                                  | Type          | Description                                                        |
+|-----------------------------------------------------------|---------------|--------------------------------------------------------------------|
+| `sync_apply_ptf_group_networkinstall_ptf_group_info`      | dict          | The ptf group's information. file_path and file_name are required. file_path must be a folder, and all of this
 ptf group's files should be in this folder. |
-| `src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
-| `delete`              | bool          | Whether or not to delete the PTF group install dir after apply. The default is True.  |
-| `ptf_omit_list`       | list          | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.  |
+| `sync_apply_ptf_group_networkinstall_src_host`            | str           | The system that has the src ptf group's files, which will be transferred to the target system.|
+| `sync_apply_ptf_group_networkinstall_ptf_omit_list`       | list          | The list of PTFs which will be omitted. The elements of the list are dict. The key of the dict should be the product ID of the fix that is omitted.  |
 
 Return Variables
 --------------
 
-| Variable              | Type          | Description                                               |
-|-----------------------|---------------|-----------------------------------------------------------|
-| `network_install_server_result`         | list          | ibmi_synchronize_files module returned result of transmission.               |
-| `network_install_client_result`        | dict          | ibmi_fix_imgclg module returned result of apply ptf group.                 |
+| Variable                                             | Type          | Description                                               |
+|------------------------------------------------------|---------------|-----------------------------------------------------------|
+| `sync_apply_ptf_group_networkinstall_server_result`  | list          | ibmi_synchronize_files module returned result of transmission.               |
+| `sync_apply_ptf_group_networkinstall_client_result`  | dict          | ibmi_fix_imgclg module returned result of apply ptf group.                 |
 
 Example Playbook
 ----------------
@@ -29,9 +28,9 @@ Example Playbook
   hosts: testhost
 
   vars:
-    ptf_group_info: { 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }
-    src_host: "{{ src_host }}"
-    ptf_omit_list: [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]
+    sync_apply_ptf_group_networkinstall_ptf_group_info: { 'file_path': '/QIBM/UserData/OS/Service/ECS/PTF/2025910369', 'file_name': ['S8404V01.BIN'] }
+    sync_apply_ptf_group_networkinstall_src_host: "{{ src_host }}"
+    sync_apply_ptf_group_networkinstall_ptf_omit_list: [{'5770SS1': 'SI78582'}, {'5770ss1': 'SI78544'}]
 
   tasks:
     - name: Include sync_apply_ptf_group role to transfer PTF group files to target ibm i, and apply
@@ -42,7 +41,7 @@ Example Playbook
 Example Returned Variables
 ----------------
 ```
-"network_install_server_result": {
+"sync_apply_ptf_group_networkinstall_server_result": {
     "changed": false,
     "delta": "0:00:16.935896",
     "fail_list": [],
@@ -60,7 +59,7 @@ Example Returned Variables
     ]
 }
 
-"network_install_client_result": {
+"sync_apply_ptf_group_networkinstall_client_result": {
         "changed": true,
         "delta": "0:00:59.082563",
         "end": "2020-09-22 16:31:32.095409",

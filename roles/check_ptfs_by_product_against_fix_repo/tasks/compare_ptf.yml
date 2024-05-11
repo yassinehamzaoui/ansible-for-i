@@ -12,7 +12,8 @@
 
 - name: Compose ptf_status
   ansible.builtin.set_fact:
-    ptf_status: "{{ ptf_status | default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system' }] }}"
+    check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
+      [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'Product not installed on target system' }] }}"
   when: result.row|length == 0
   no_log: true
 
@@ -52,8 +53,8 @@
         ptf_list: "{{ ptf_list | default([]) + [{ 'PTF_IDENTIFIER': ptf_info.ptf_id, 'PTF_LOADED_STATUS': ptf_on_system[ptf_info.ptf_id] }] }}"
       when:
         - ptf_on_system.get(ptf_info.ptf_id)
-        - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or\
-          ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or\
+        - ptf_on_system[ptf_info.ptf_id] == 'APPLIED' or
+          ptf_on_system[ptf_info.ptf_id] == 'PERMANENTLY APPLIED' or
           ptf_on_system[ptf_info.ptf_id] == 'SUPERSEDED'
       with_list: "{{ ptf_info_list }}"
       loop_control:
@@ -61,6 +62,7 @@
 
     - name: Compose ptf_status
       ansible.builtin.set_fact:
-        ptf_status: "{{ ptf_status | default([]) + [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list }] }}"
+        check_ptfs_by_product_against_fix_repo_ptf_status: "{{ check_ptfs_by_product_against_fix_repo_ptf_status | default([]) +
+          [{ 'PRODUCT': ptf_info_list[0].product, 'PRODUCT_STATUS': 'OK', 'PTF_LIST': ptf_list }] }}"
       no_log: true
       when: result.row | length > 0

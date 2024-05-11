@@ -1,5 +1,9 @@
 ---
 # Default values for load_apply_ptfs
-remote_lib: 'QGPL'
-loaded_list: []
-load_success_list: []
+load_apply_ptfs_remote_lib: 'QGPL'
+load_apply_ptfs_loaded_list: []
+load_apply_ptfs_load_success_list: []
+load_apply_ptfs_apply_all_loaded_ptf: true
+load_apply_ptfs_temp_or_perm: '*TEMP'
+load_apply_ptfs_delayed_option: '*IMMDLY'
+load_apply_ptfs_auto_ipl: false

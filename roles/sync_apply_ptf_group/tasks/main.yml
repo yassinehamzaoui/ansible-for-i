@@ -5,11 +5,13 @@
 - name: Initialize src_list and sync_apply_fail
   ansible.builtin.set_fact:
     src_list: []
-    sync_apply_fail: false
+    sync_apply_ptf_group_sync_apply_fail: false
+    sync_apply_ptf_group_sync_result: {}
+    sync_apply_ptf_group_apply_result: {}
 
 - name: Compose target tmp dir str
   ansible.builtin.set_fact:
-    path: "{{ dest }}/{{ ptf_group_info.file_path | basename }}"
+    path: "{{ sync_apply_ptf_group_dest }}/{{ sync_apply_ptf_group_ptf_group_info.file_path | basename }}"
 
 - name: Check if the folder is already exists
   ansible.builtin.stat:
@@ -21,13 +23,13 @@
   ansible.builtin.include_role:
     name: check_file
   vars:
-    target_file_path: "{{ path }}"
-    repo_file_path: "{{ ptf_group_info.file_path }}"
-    repo_server: "{{ src_host }}"
+    check_file_target_file_path: "{{ path }}"
+    check_file_repo_file_path: "{{ sync_apply_ptf_group_ptf_group_info.file_path }}"
+    check_file_repo_server: "{{ sync_apply_ptf_group_src_host }}"
   when: stat_result.stat.exists
 
 - name: Set up and transfer images
-  when: (same_files is defined and not same_files) or not stat_result.stat.exists
+  when: (check_file_same_files is defined and not check_file_same_files) or not stat_result.stat.exists
   block:
     - name: Clear receive dir
       ansible.builtin.file:
@@ -53,15 +55,15 @@
 
         - name: Initialize sync_apply_fail
           ansible.builtin.set_fact:
-            sync_apply_fail: true
+            sync_apply_ptf_group_sync_apply_fail: true
 
     - name: Transfer images
       block:
         - name: Recursively find files on source host / repo server
           ansible.builtin.find:
-            paths: "{{ ptf_group_info.file_path }}"
+            paths: "{{ sync_apply_ptf_group_ptf_group_info.file_path }}"
             recurse: true
-          delegate_to: "{{ src_host }}"
+          delegate_to: "{{ sync_apply_ptf_group_src_host }}"
           register: find_result_repo
 
         - name: Compose src_list
@@ -79,15 +81,16 @@
           ibm.power_ibmi.ibmi_synchronize_files:
             dest: "{{ path }}"
             src_list: "{{ src_list }}"
-          delegate_to: "{{ src_host }}"
-          register: sync_result
+          delegate_to: "{{ sync_apply_ptf_group_src_host }}"
+          register: sync_apply_ptf_group_sync_result
 
         # - name: Print transfer
         #   ansible.builtin.debug:
-        #     var: sync_result
+        #     var: sync_apply_ptf_group_sync_result
 
-        - name: Sync failure handling
-          when: sync_result.fail_list != []
+        # Handle case when one or more files failed to transfer
+        - name: Sync failure handling with file transfer failure
+          when: sync_apply_ptf_group_sync_result.fail_list != []
           block:
             - name: Skip when transfer failed
               ansible.builtin.debug:
@@ -95,10 +98,23 @@
 
             - name: Set sync_apply_fail
               ansible.builtin.set_fact:
-                sync_apply_fail: true
+                sync_apply_ptf_group_sync_apply_fail: true
+
+        # Handle case when there was nothing valid to sync, i.e., src_list == [], so note failure to skip apply step
+        # TODO: Probably should short-circuit this case and skip calling ibmi_synchronize_files earlier
+        - name: Sync failure handling if no valid files to sync
+          when: src_list == []
+          block:
+            - name: Skip when there are no valid files to sync
+              ansible.builtin.debug:
+                msg: "No valid ptf group files to transfer, quit apply ptf group action."
+
+            - name: Set sync_apply_fail
+              ansible.builtin.set_fact:
+                sync_apply_ptf_group_sync_apply_fail: true
 
 - name: Apply PTFs
-  when: not sync_apply_fail
+  when: not sync_apply_ptf_group_sync_apply_fail
   block:
     - name: Get the home dir on target server
       ansible.builtin.shell: 'echo $HOME'
@@ -117,16 +133,16 @@
     - name: Apply PTF group
       ibm.power_ibmi.ibmi_fix_imgclg:
         src: '{{ path }}'
-        fix_omit_list: '{{ ptf_omit_list | default([]) }}'
+        fix_omit_list: '{{ sync_apply_ptf_group_ptf_omit_list | default([]) }}'
         rollback: true
-      register: apply_result
+      register: sync_apply_ptf_group_apply_result
 
     - name: Print apply result
       ansible.builtin.debug:
-        var: apply_result
+        var: sync_apply_ptf_group_apply_result
 
 - name: Delete the dest file dir
   ansible.builtin.file:
     path: "{{ path }}"
     state: absent
-  when: delete
+  when: sync_apply_ptf_group_delete

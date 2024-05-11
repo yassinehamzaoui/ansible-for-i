@@ -8,8 +8,8 @@
     - name: Add VM to Ansible in-memory inventory for host - the target of sync
       add_host:
         name: "fix_repo"
-        ansible_ssh_host: my.repo.server
-        ansible_user: zhaoyao 
+        ansible_ssh_host: ut2026p8.rch.stglabs.ibm.com
+        ansible_user: tester 
         groups: ibmi
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3  
