@@ -169,7 +169,7 @@ try:
 except ImportError:
     HAS_ITOOLKIT = False
 
-__ibmi_module_version__ = "3.0.0"
+__ibmi_module_version__ = "3.1.0"
 
 
 sysval_array = [

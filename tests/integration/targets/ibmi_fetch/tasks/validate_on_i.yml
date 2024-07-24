@@ -45,4 +45,5 @@
 - name: assert the size of the object is name as the original
   assert:
     that:
-      - "{{ restored_result.object_list[0]['OBJSIZE'] }} == {{ original_result.object_list[0]['OBJSIZE'] }}"
+      - restored_result.object_list[0]['OBJSIZE'] == original_result.object_list[0]['OBJSIZE']
+      

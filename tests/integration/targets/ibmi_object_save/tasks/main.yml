@@ -7,9 +7,9 @@
     ## Setup - Create libraries and objects on test systems
     - copy: src="IBMISAVF.FILE" dest="/tmp/"
     
-    - include: save_object.yml
+    - ansible.builtin.include_tasks: save_object.yml
 
-    - include: iasp.yml
+    - ansible.builtin.include_tasks: iasp.yml
 
   always:
     - name: remove copied file

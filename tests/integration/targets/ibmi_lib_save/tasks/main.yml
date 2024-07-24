@@ -5,8 +5,8 @@
 #
 - block: 
     ## Setup - Create libraries and objects on test systems
-    - include: save_lib.yml
-    - include: iasp.yml
+    - ansible.builtin.include_tasks: save_lib.yml
+    - ansible.builtin.include_tasks: iasp.yml
 
   always:
     - name: remove copied file

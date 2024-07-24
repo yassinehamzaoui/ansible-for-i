@@ -44,4 +44,4 @@
       - result_02a.success_list | length == 2
 
 - name: negative test
-  include: neg_cases.yml
+  ansible.builtin.include_tasks: neg_cases.yml

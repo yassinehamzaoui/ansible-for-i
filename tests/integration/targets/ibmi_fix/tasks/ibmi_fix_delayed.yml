@@ -7,7 +7,7 @@
     single_delay_ptf_number: "{{(delay_ptf | dict2items)[0]['key']}}"
     single_delay_ptf_product: "{{(delay_ptf | dict2items)[0]['value']}}"
 
-- include: query_remove_ptf.yml
+- ansible.builtin.include_tasks: query_remove_ptf.yml
   with_dict: '{{delay_ptf}}'
 
 - name: query delay ptf with only requried options

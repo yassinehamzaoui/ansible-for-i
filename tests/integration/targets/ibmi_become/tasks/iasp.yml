@@ -36,7 +36,7 @@
   - name: TC01 assert the returned options of display
     assert:
       that:
-        - authority_result.object_authority_list[0].OWNER == '{{becomeuser.upper()}}'
+        - authority_result.object_authority_list[0].OWNER == becomeuser.upper()
   when: iasp_list.row | length >= 1 
 
   always:

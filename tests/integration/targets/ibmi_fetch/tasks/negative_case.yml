@@ -60,7 +60,7 @@
     dest: '{{ output_dir }}/fetched'
   register: fetch_result
 
-- include: setup_lib.yml
+- ansible.builtin.include_tasks: setup_lib.yml
 
 # Test object_type doesn't match
 - name: TC30 Fetch objects with object_type doesn't match

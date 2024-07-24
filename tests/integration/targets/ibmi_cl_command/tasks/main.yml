@@ -35,7 +35,7 @@
 
     - set_fact:
         local_temp_dir: '{{ tempfile_result.stdout }}'
-        remote_dir: '{{ remote_tmp_dir }}'
+        #remote_dir: '{{ remote_tmp_dir }}'
         remote_temp_lib: 'ARCHLIB'
         remote_restored_lib: 'SAVRST'
         savf_name: 'SAVRST.FILE'
@@ -61,7 +61,7 @@
         - '{{ remote_temp_lib }}'
         - '{{ remote_restored_lib }}'
 
-    - include: ibmi_copy.yml
+    - ansible.builtin.include_tasks: ibmi_copy.yml
 
   always:
     - name: Cleaning

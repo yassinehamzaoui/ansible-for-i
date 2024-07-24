@@ -1,2 +1,2 @@
-- include: test_prep.yml
-- include: sync_files.yml
+- ansible.builtin.include_tasks: test_prep.yml
+- ansible.builtin.include_tasks: sync_files.yml

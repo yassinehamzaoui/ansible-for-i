@@ -50,8 +50,8 @@
           - "original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length >= 1 or original_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3773') | map(attribute='MESSAGE_ID') | list | length >= 1"
       when: "original_result.rc != 0"
 
-    - include: negative_case.yml
-    - include: ibmi_fetch.yml
+    - ansible.builtin.include_tasks: negative_case.yml
+    - ansible.builtin.include_tasks: ibmi_fetch.yml
     
   always:
     - name: remove copied file

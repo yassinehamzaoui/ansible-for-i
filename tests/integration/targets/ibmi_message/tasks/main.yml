@@ -3,8 +3,8 @@
 #
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 
-- include: no_reply.yml
-- include: qsysopr.yml
+- ansible.builtin.include_tasks: no_reply.yml
+- ansible.builtin.include_tasks: qsysopr.yml
     
 - block: 
     - set_fact:
@@ -22,7 +22,7 @@
         cmd: "QSYS/CRTMSGQ MSGQ({{msgq_lib}}/{{item}})"
       loop: "{{msgq}}"
 
-    - include: message.yml
+    - ansible.builtin.include_tasks: message.yml
 
   always:
     - name: delete library

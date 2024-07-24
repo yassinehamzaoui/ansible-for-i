@@ -12,6 +12,10 @@
     download_individual_ptfs_order: '*PTFID'
     download_individual_ptfs_download_server: "ut2026p8.rch.stglabs.ibm.com"
 
+- name: set fact for fail_reason
+  set_fact: 
+    fail_reason: "PTF *ONLYPRD-{{neg_ptfs[0]}} *ONLYRLS not available on the service provider system."
+
 - name: assert values
   assert:
     that:
@@ -19,7 +23,7 @@
       - download_individual_ptfs_download_fail_list is defined
       - download_individual_ptfs_download_success_list | length == 0
       - download_individual_ptfs_download_fail_list | length == 2
-      - download_individual_ptfs_download_fail_list[0]['ptf_id'] == "{{neg_ptfs[0]}}"
-      - download_individual_ptfs_download_fail_list[1]['ptf_id'] == "{{neg_ptfs[1]}}"
-      - download_individual_ptfs_download_fail_list[0]['fail_reason'] == "PTF *ONLYPRD-{{neg_ptfs[0]}} *ONLYRLS not available on the service provider system."      
+      - download_individual_ptfs_download_fail_list[0]['ptf_id'] == neg_ptfs[0]
+      - download_individual_ptfs_download_fail_list[1]['ptf_id'] == neg_ptfs[1]
+      - download_individual_ptfs_download_fail_list[0]['fail_reason'] == fail_reason
       - download_individual_ptfs_download_fail_list[1]['fail_reason'] == "Submit job failed."    

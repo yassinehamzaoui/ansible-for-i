@@ -7,7 +7,7 @@
     single_immed_ptf_number: "{{(immed_ptf | dict2items)[0]['key']}}"
     single_immed_ptf_product: "{{(immed_ptf | dict2items)[0]['value']}}"
 
-- include: query_remove_ptf.yml
+- ansible.builtin.include_tasks: query_remove_ptf.yml
   with_dict: '{{immed_ptf}}'
 
 - name: query immed ptf with only requried options

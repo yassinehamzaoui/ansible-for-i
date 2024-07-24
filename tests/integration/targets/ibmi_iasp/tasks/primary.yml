@@ -39,7 +39,7 @@
       - iasp_result.asp_info is defined
       - iasp_result.asp_info | length == 1
       - iasp_result.asp_info[0]['ASP_TYPE'] == 'PRIMARY'
-      - iasp_result.asp_info[0]['RESOURCE_NAME'] == '{{new_iasp[0]}}'
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == new_iasp[0]
       - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] | int == 1
 
 - name: query non-configured disks
@@ -52,8 +52,8 @@
 - name: assert the returned parameters 
   assert:
     that: 
-      - "'{{disk_list[0]}}' not in '{{free_disks}}'"
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -1 }}"
+      - disk_list[0] not in free_disks
+      - disk_result['disks'].split(' ') | length == disk_list | length -1
 
 - name: add disk to the vary off iasp
   ibmi_iasp:
@@ -87,7 +87,7 @@
     that: 
       - iasp_result.asp_info | length == 1
       - iasp_result.asp_info[0]['ASP_TYPE'] == 'PRIMARY'
-      - iasp_result.asp_info[0]['RESOURCE_NAME'] == '{{new_iasp[0]}}'
+      - iasp_result.asp_info[0]['RESOURCE_NAME'] == new_iasp[0]
       - iasp_result.asp_info[0]['NUMBER_OF_DISK_UNITS'] | int == 2
 
 - name: vary on the iasp
@@ -101,7 +101,7 @@
     operation: 'display'
   register: iasp_result
 
-- include: iasp.yml
+- ansible.builtin.include_tasks: iasp.yml
   vars: 
     asp_name: "{{new_iasp[0]}}"
   when: iasp_result.asp_info[0]['ASP_STATE'] == 'AVAILABLE' 
@@ -131,7 +131,7 @@
 - name: assert the returned parameters
   assert:
     that: 
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length -3 }}"
+      - disk_result['disks'].split(' ') | length == disk_list | length - 3
 
 - name: vary off the iasp
   ibmi_device_vary:
@@ -164,4 +164,4 @@
 - name: assert the returned parameters
   assert:
     that: 
-      - "{{disk_result['disks'].split(' ') | length }} == {{disk_list | length }}"
+      - disk_result['disks'].split(' ') | length == disk_list | length

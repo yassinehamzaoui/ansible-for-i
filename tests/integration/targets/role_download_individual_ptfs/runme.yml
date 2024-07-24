@@ -17,7 +17,7 @@
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
-    - include: cleanup.yml
+    - ansible.builtin.import_tasks: cleanup.yml
       delegate_to: "ut2026p8.rch.stglabs.ibm.com"
 
     - name: IBM i download a list of individual PTFs
@@ -37,11 +37,11 @@
           - download_individual_ptfs_download_fail_list is defined
           - download_individual_ptfs_download_success_list | length == 2
           - download_individual_ptfs_download_fail_list | length == 0
-          - download_individual_ptfs_download_success_list[0]['ptf_id'] == "{{ptfs[0]}}"
-          - download_individual_ptfs_download_success_list[1]['ptf_id'] == "{{ptfs[1]}}"
+          - download_individual_ptfs_download_success_list[0]['ptf_id'] == ptfs[0]
+          - download_individual_ptfs_download_success_list[1]['ptf_id'] == ptfs[1]
           - download_individual_ptfs_download_success_list[0]['release'] != ""
           - download_individual_ptfs_download_success_list[1]['release'] != ""
         
     - name: negative test
-      include: neg_case.yml      
+      ansible.builtin.import_tasks: neg_case.yml      
       delegate_to: "ut2026p8.rch.stglabs.ibm.com"

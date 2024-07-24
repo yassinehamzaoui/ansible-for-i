@@ -1,5 +1,48 @@
 # Change Log
 
+## v3.1.0 (2024-07-24)
+
+The collection is verified on Ansible core 2.16 with this release.
+The collection now requires Ansible core levels 2.15 or 2.16 and drops Ansible level 2.14.
+
+Note that the use of Ansible 2.16 requires Python 3.10 or higher on the Ansible
+control node, while IBM i currently only includes python packages
+up to version 3.9. This IBM i limitation requires staying with Ansible 2.15
+if you are using an IBM i control node with the provided IBM i Python packages;
+however, this does not impact IBM i target nodes which may run at lower levels of Python.
+There should be a higher level of Python provided by IBM i later this year that will
+resolve this limitation.
+
+The Redhat AAP collection download image will now exclude some content that relies on
+uncertified collection functionality as detailed below.
+The Ansible Galaxy build image for download will continue to provide the entire collection.
+
+The modifications for this release include:
+
+### Changes for supporting Ansible 2.16 and dropping Ansible 2.14
+
+- Changes to handle deprecated items in tests for Ansible 2.16 such as
+  - Replacing the use of include with include_tasks / import_tasks.
+  - Removing Jinja2 template usage in conditionals.
+
+- Meta file updates to set the minimum Ansible level to 2.15 for the collection
+  because Redhat has recently dropped Ansible 2.14 support.
+
+- Update documentation.
+
+- Adding in minor test fixes or work arounds to resolve test case issues.
+
+- Updating the README with additional sections as required by Redhat.
+
+### Updates to avoid uncertified collections due to Redhat requirements
+
+- Remove reference to uncertified community.general.git_config
+  module and use builtin command instead.
+
+- Generate a separate collection build image for Redhat AAP download that avoids including
+  references to the uncertified collection openstack.cloud by excluding the
+  PowerVC related roles and the CICD use cases that rely on the PowerVC roles.
+
 ## v3.0.0 (2024-05-10)
 
 This release includes the final changes to ensure continued compliance with the Redhat certification process.

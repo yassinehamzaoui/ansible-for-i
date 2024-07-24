@@ -8,10 +8,10 @@
     requiste_ptf_number: "{{(requisite_ptf | dict2items)[0]['key']}}"
     requiste_ptf_product: "{{(requisite_ptf | dict2items)[0]['value']}}"  
 
-- include: query_remove_ptf.yml
+- ansible.builtin.include_tasks: query_remove_ptf.yml
   with_dict: '{{immed_ptf_with_requisite}}'
 
-- include: query_remove_ptf.yml
+- ansible.builtin.include_tasks: query_remove_ptf.yml
   with_dict: '{{requisite_ptf}}'
   
 - name: install fixes

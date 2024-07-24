@@ -4,7 +4,7 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 
-- include: long_name.yml
+- ansible.builtin.include_tasks: long_name.yml
 
 # test negative test cases
 - name: Verify 5770SS1 Option 39

@@ -12,7 +12,7 @@
       - user_result.stdout_lines is not defined
       - user_result.stderr_lines is not defined 
       - user_result.result_set | length == 1
-      - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{ansible_ssh_user.upper()}}'
+      - user_result.result_set[0]['AUTHORIZATION_NAME'] == ansible_ssh_user.upper()
 
 - name: TC02 display with other options to ensure other options are ignored
   ibmi_user_and_group:
@@ -37,4 +37,4 @@
       - user_result.stdout_lines is not defined
       - user_result.stderr_lines is not defined 
       - user_result.result_set | length == 1
-      - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{ansible_ssh_user.upper()}}'
+      - user_result.result_set[0]['AUTHORIZATION_NAME'] == ansible_ssh_user.upper()

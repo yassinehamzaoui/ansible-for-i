@@ -17,7 +17,7 @@
         comp: ''
         
     - name: loop to set fact
-      include: find_msg_id.yml      
+      ansible.builtin.include_tasks: find_msg_id.yml
       loop: "{{ msg_list}}"
 
     - name: TC05 find message with message id

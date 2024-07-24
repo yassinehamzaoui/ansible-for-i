@@ -59,10 +59,10 @@
     dest: '{{remote_dir}}'
   loop: '{{base_image_list}}'
 
-- include: ibmi_fix_imgclg.yml
+- ansible.builtin.include_tasks: ibmi_fix_imgclg.yml
   when: "os_version != '74'"
 
-- include: ibmi_fix_imgclg_74.yml 
+- ansible.builtin.include_tasks: ibmi_fix_imgclg_74.yml 
   when: "os_version == '74'"
   
-- include: negative_case.yml
+- ansible.builtin.include_tasks: negative_case.yml

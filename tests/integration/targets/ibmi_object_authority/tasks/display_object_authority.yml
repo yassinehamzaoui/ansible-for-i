@@ -48,7 +48,7 @@
           - authority_result.object_authority_list[0].OBJECT_REFERENCE is defined
           - authority_result.object_authority_list[0].OBJECT_SCHEMA is defined 
           - authority_result.object_authority_list[0].OBJECT_TYPE == "*FILE"
-          - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+          - authority_result.object_authority_list[0].OWNER == ansible_ssh_user.upper()
           - authority_result.object_authority_list[0].SQL_OBJECT_TYPE is defined
           - authority_result.object_authority_list[0].SYSTEM_OBJECT_NAME == 'ANSIOBJ1' 
           - authority_result.object_authority_list[0].SYSTEM_OBJECT_SCHEMA == 'TEMPLIB' 
@@ -85,7 +85,7 @@
           - item['OBJECT_MANAGEMENT'] == 'YES'
           - item['OBJECT_OPERATIONAL'] == 'YES'
           - item['OBJECT_REFERENCE'] == 'YES'
-      when: item['AUTHORIZATION_NAME'] == "{{ansible_ssh_user.upper()}}"
+      when: item['AUTHORIZATION_NAME'] == ansible_ssh_user.upper()
       loop: "{{authority_result.object_authority_list}}"
 
     - name: TC02 display authority without library
@@ -230,7 +230,7 @@
           - authority_result.object_authority_list[0].OBJECT_REFERENCE is defined
           - authority_result.object_authority_list[0].OBJECT_SCHEMA is defined 
           - authority_result.object_authority_list[0].OBJECT_TYPE == "*FILE"
-          - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+          - authority_result.object_authority_list[0].OWNER == ansible_ssh_user.upper()
           - authority_result.object_authority_list[0].SQL_OBJECT_TYPE is defined
           - authority_result.object_authority_list[0].SYSTEM_OBJECT_NAME == 'ANSIOBJ1' 
           - authority_result.object_authority_list[0].SYSTEM_OBJECT_SCHEMA == 'TEMPLIB' 

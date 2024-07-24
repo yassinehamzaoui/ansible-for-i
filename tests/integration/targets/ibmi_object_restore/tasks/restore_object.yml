@@ -19,7 +19,7 @@
       - rstobj_result.end != ''
       - rstobj_result.delta != ''
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC02 restore objects to library with only required options
   ibmi_object_restore:
@@ -30,7 +30,7 @@
   #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
   failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC03 restore objects to library with object_names
   ibmi_object_restore:
@@ -63,7 +63,7 @@
   #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
   failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC05 restore objects to library with object_types
   ibmi_object_restore:
@@ -101,7 +101,7 @@
   #failed_when: "'CPF3848' not in rstobj_result.stderr and rstobj_result.rc != 0"
   failed_when: "rstobj_result.rc != 0 and rstobj_result.job_log | selectattr('MESSAGE_ID', 'equalto', 'CPF3848') | map(attribute='MESSAGE_ID') | list | length == 0"
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC07 restore objects to library with parameters
   ibmi_object_restore:
@@ -126,7 +126,7 @@
     expected_row_count: 2
 
 # Test negitive path
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC08 restore objects with an not-existing object_names
   ibmi_object_restore:

@@ -6,7 +6,7 @@
 ## S0240V01.BIN - MF66738 (immed ptf) and its dependent ptf (MF66667, MF66739 are delayed PTF)
 ## S1422V01.BIN - 5770SS1 SI70892 5770SS1 SI71023 5733OMF SI70133 5770999 MF66177 5770ST1 SI70943 and their dependent PTFs.
 
-- include: remove_ptf.yml
+- ansible.builtin.include_tasks: remove_ptf.yml
 
 - name: install fix with default options, supposed the default apply_type is DLYALL
   ibmi_fix_imgclg:
@@ -47,7 +47,7 @@
   failed_when: "ptf_status.row | length != 0 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED' and ptf_status.row[0]['PTF_IPL_ACTION'] != 'TEMPORARILY APPLIED'"
   loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
-- include: remove_ptf.yml
+- ansible.builtin.include_tasks: remove_ptf.yml
 
 - name: Query the ptf status
   ibmi_sql_query:
@@ -88,7 +88,7 @@
   failed_when: "ptf_status.row | length != 1 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED'"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"
 
-- include: remove_ptf.yml
+- ansible.builtin.include_tasks: remove_ptf.yml
 
 - name: Query the ptf status
   ibmi_sql_query:
@@ -139,7 +139,7 @@
   failed_when: "ptf_status.row | length != 1 and ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED'"
   loop: "{{(hiper_ptf_info.values() | join(' ')).split(' ')}}"
 
-- include: remove_ptf.yml
+- ansible.builtin.include_tasks: remove_ptf.yml
 
 - name: Query the ptf status
   ibmi_sql_query:

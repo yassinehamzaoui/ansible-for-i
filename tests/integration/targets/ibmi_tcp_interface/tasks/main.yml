@@ -29,7 +29,7 @@
     sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
   register: ifc_info
 
-- include: cleanup.yml
+- ansible.builtin.include_tasks: cleanup.yml
   loop: '{{ifc_info.row}}'
   when: ifc_info.row | length > 0 
 
@@ -156,20 +156,21 @@
     - name: TC03 assert the returned options
       assert:
         that:
-          - 'tcp_result.cl_command == ""'  
-          - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == "{{lind_name}}"
-          - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == "{{ifc_ip}}"
+          - tcp_result.cl_command == ""  
+          - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == lind_name
+          - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == ifc_ip
           - tcp_result.interface_info[0]['SUBNET_MASK'] == ip_interface_info.row[0]['SUBNET_MASK']
-          - tcp_result.interface_info[0]['ALIAS_NAME'] == "{{ifc_name}}" 
-          - tcp_result.interface_info[0]['AUTOSTART'] == 'NO'
-          - tcp_result.interface_info[0]['CONNECTION_TYPE'] == 'IPV4'
+          - tcp_result.interface_info[0]['ALIAS_NAME'] == ifc_name 
+          - tcp_result.interface_info[0]['AUTOSTART'] == "NO"
+          - tcp_result.interface_info[0]['CONNECTION_TYPE'] == "IPV4"
           - tcp_result.interface_info[0]['INTERFACE_LINE_TYPE'] is defined
-          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'INACTIVE'
+          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == "INACTIVE"
           - tcp_result.interface_info[0]['LAST_CHANGE_TIMESTAMP'] is defined
-          - tcp_result.interface_info[0]['CONFIGURED_MAXIMUM_TRANSMISSION_UNIT'] == '1024'
+          - tcp_result.interface_info[0]['CONFIGURED_MAXIMUM_TRANSMISSION_UNIT'] == "1024"
           - tcp_result.interface_info[0]['NETWORK_ADDRESS'] is defined
-          - tcp_result.interface_info[0]['SERVICE_TYPE'] == 'NORMAL' 
-          - tcp_result.interface_info[0]['VIRTUAL_LAN_ID'] == '2'
+          - tcp_result.interface_info[0]['SERVICE_TYPE'] == "NORMAL"
+          - tcp_result.interface_info[0]['VIRTUAL_LAN_ID'] == "2"
+
 
     - name: TC04 change a IFC with all supported options 
       ibmi_tcp_interface: 
@@ -209,20 +210,20 @@
     - name: TC05 assert the returned options
       assert:
         that:
-          - 'tcp_result.cl_command == ""'
-          - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == "{{lind_name}}"
-          - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == "{{ifc_ip}}"
+          - tcp_result.cl_command == ""
+          - tcp_result.interface_info[0]['LINE_DESCRIPTION'] == lind_name
+          - tcp_result.interface_info[0]['INTERNET_ADDRESS'] == ifc_ip
           - tcp_result.interface_info[0]['SUBNET_MASK'] == ip_interface_info.row[0]['SUBNET_MASK']
-          - tcp_result.interface_info[0]['ALIAS_NAME'] == "{{ifc_name}}2" 
-          - tcp_result.interface_info[0]['AUTOSTART'] == 'NO'
-          - tcp_result.interface_info[0]['CONNECTION_TYPE'] == 'IPV4'
+          - tcp_result.interface_info[0]['ALIAS_NAME'] == (ifc_name ~ 2)
+          - tcp_result.interface_info[0]['AUTOSTART'] == "NO"
+          - tcp_result.interface_info[0]['CONNECTION_TYPE'] == "IPV4"
           - tcp_result.interface_info[0]['INTERFACE_LINE_TYPE'] is defined
-          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == 'INACTIVE'
+          - tcp_result.interface_info[0]['INTERFACE_STATUS'] == "INACTIVE"
           - tcp_result.interface_info[0]['LAST_CHANGE_TIMESTAMP'] is defined
-          - tcp_result.interface_info[0]['CONFIGURED_MAXIMUM_TRANSMISSION_UNIT'] == '1024'
+          - tcp_result.interface_info[0]['CONFIGURED_MAXIMUM_TRANSMISSION_UNIT'] == "1024"
           - tcp_result.interface_info[0]['NETWORK_ADDRESS'] is defined
           - tcp_result.interface_info[0]['SERVICE_TYPE'] is defined
-          - tcp_result.interface_info[0]['VIRTUAL_LAN_ID'] == '2'
+          - tcp_result.interface_info[0]['VIRTUAL_LAN_ID'] == "2"
 
     - name: TC06 remove the ifc 
       ibmi_tcp_interface: 
@@ -354,7 +355,7 @@
         that: 
           - '"QSYS/RMVTCPIFC" in tcp_result.cl_command'
 
-    - include: negative_case.yml
+    - ansible.builtin.include_tasks: negative_case.yml
 
   always:
     - name: query ip interface from remote system
@@ -362,6 +363,6 @@
         sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
       register: ifc_info
 
-    - include: cleanup.yml
+    - ansible.builtin.include_tasks: cleanup.yml
       loop: '{{ifc_info.row}}'
       when: ifc_info.row | length > 0 

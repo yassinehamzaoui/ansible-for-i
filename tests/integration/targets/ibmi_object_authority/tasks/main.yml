@@ -38,11 +38,11 @@
       ibmi_cl_command: 
         cmd: ADDAUTLE AUTL({{au_list[1]}}) USER({{new_user[1]}}) AUT(*EXCLUDE)
 
-    - include: display_object_authority.yml
-    - include: grant_object_authority.yml
-    - include: grant_aul_list.yml
-    - include: grant_ref.yml
-    - include: iasp.yml
+    - ansible.builtin.include_tasks: display_object_authority.yml
+    - ansible.builtin.include_tasks: grant_object_authority.yml
+    - ansible.builtin.include_tasks: grant_aul_list.yml
+    - ansible.builtin.include_tasks: grant_ref.yml
+    - ansible.builtin.include_tasks: iasp.yml
 
   always:
     - name: remove AUL

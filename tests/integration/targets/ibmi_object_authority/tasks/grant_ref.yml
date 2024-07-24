@@ -84,7 +84,7 @@
     - name: assert the returned object is correct
       assert:
         that:
-          - item['AUTHORIZATION_LIST'] == '{{au_list[1].upper()}}'
+          - item['AUTHORIZATION_LIST'] == au_list[1].upper()
       loop: "{{authority_result.object_authority_list }}"
       when: os_version | int >= 74
 
@@ -109,7 +109,7 @@
     - name: assert the returned object is correct
       assert:
         that:
-          - item['AUTHORIZATION_LIST'] == '{{au_list[0].upper()}}'
+          - item['AUTHORIZATION_LIST'] == au_list[0].upper()
       loop: "{{authority_result.object_authority_list }}"
       when: os_version | int >= 74
 

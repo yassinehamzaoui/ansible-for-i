@@ -36,8 +36,8 @@
             - '{{ptf_for_product_not_installed.keys() | list}}'
             - '{{delay_ptf.keys() | list}}'  
 
-        - include: ibmi_fix_delayed.yml
-        - include: ibmi_fix has_requisites.yml
+        - ansible.builtin.include_tasks: ibmi_fix_delayed.yml
+        - ansible.builtin.include_tasks: ibmi_fix has_requisites.yml
       when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
     
 
@@ -47,8 +47,8 @@
         lib_name: '{{remote_lib}}'
       loop: '{{immed_ptf.keys() | list}}'
 
-    - include: ibmi_fix.yml
-    - include: negative_case.yml
+    - ansible.builtin.include_tasks: ibmi_fix.yml
+    - ansible.builtin.include_tasks: negative_case.yml
 
   always:
       - ibmi_cl_command:
