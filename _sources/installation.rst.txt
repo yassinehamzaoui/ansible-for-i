@@ -28,7 +28,7 @@ There are two options to install IBM i collection for Ansible:
 Requirements
 ------------
 
-In order to use this Ansible collection at **release 2.0.0** and beyond, you must have the following pre-requisite software installed and available on your Ansible server:
+In order to use this Ansible collection at **release 3.1.0** and beyond, you must have the following pre-requisite software installed and available on your Ansible server:
 
 **Python v3.9+**
 
@@ -38,7 +38,12 @@ In order to use this Ansible collection at **release 2.0.0** and beyond, you mus
     - The official Python website: https://www.python.org/downloads/
     - The unofficial Python version manager: https://github.com/pyenv/pyenv
 
-**Ansible v2.14+**
+**Ansible core v2.15 or v2.16**
+
+    - Ansible core v2.15 requires Python 3.9+ on the Ansible control node.
+    - Ansible core v2.16 requires Python 3.10+ on the Ansible control node.
+
+    The full compatiblity or support matrix for Ansible Core versions and Python levels for the control node and targets is provided at https://docs.ansible.com/ansible/latest/reference_appendices/release_and_maintenance.html.
 
     Ansible can be installed from a variety of sources, including the package manager for your operating system (apt, yum, etc). You can also install it using ``pip``, the package manager for Python:
 
@@ -46,8 +51,8 @@ In order to use this Ansible collection at **release 2.0.0** and beyond, you mus
 
         pip3 install ansible
 
-Requirements for IBM i Ansible Server
--------------------------------------
+Requirements for IBM i Ansible Server / Control Node
+-----------------------------------------------------
 
 For an IBM i Ansible control node, the latest levels of Ansible should be installed with python pip because there is not a pre-packaged Ansible rpm above version 2.9. Ansible may also be installed from the github source with a stable ansible branch. The following steps can be used to install Ansible with pip.
 
@@ -70,7 +75,7 @@ For an IBM i Ansible control node, the latest levels of Ansible should be instal
 
 3. Install Ansible. Either full ansible (a) or ansible-core (b).
 
-   a. Install Ansible at 7.X (v2.14 core) or 8.X level (v2.15 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
+   a. Install Ansible at 8.X level (v2.15 core) or 9.X level (v2.16 core) with pip (skip step 3b). For example, to install level 8.1 that includes v2.15.6 ansible-core use the following:
 
       ::
 
@@ -82,6 +87,8 @@ For an IBM i Ansible control node, the latest levels of Ansible should be instal
 
           python3 -m pip install --user ansible-core==2.15.1
 
+   Note that Ansible core v2.16 cannot be used with the currently available IBM i Python rpm packages (Python 3.9 is highest level).
+
 4. Add the following path to ~/.profile for the ansible executables:
 
    ::
@@ -91,8 +98,6 @@ For an IBM i Ansible control node, the latest levels of Ansible should be instal
 5. Ensure dependent collections are installed if only using ansible-core. Perform the following collection install commands if ''ansible-galaxy collection list'' doesn't show these collections. 
 
    ::
-
-       ansible-galaxy collection install community.general 
 
        ansible-galaxy collection install openstack.cloud
 
