@@ -40,7 +40,7 @@
         sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
       register: ifc_info
 
-    - include: cleanup.yml
+    - ansible.builtin.include_tasks: cleanup.yml
       loop: '{{ifc_info.row}}'
       when: ifc_info.row | length > 0
 
@@ -82,7 +82,7 @@
           - nrg_result.msg is defined  
           - nrg_result.rc == 0 
           #- sql_result.row | length == sql_org_result.row | length + 5
-          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length >= 1
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', ifc_ip) | map(attribute='SOURCE_ADDRESS') | list | length >= 1
 
     - name: TC01 assert the nrg link properties
       assert:
@@ -93,7 +93,7 @@
           - item['LINE_DESCRIPTION'] is defined
           - item['ADDRESS_SPACE_TYPE'] == 'IPV4'
           - item['LINK_STATE'] == 'DOWN' 
-      when: item['SOURCE_ADDRESS'] == '{{ifc_ip}}'
+      when: item['SOURCE_ADDRESS'] == ifc_ip
       loop: "{{sql_result['row']}}" 
 
     - name: TC02 remove nrg link with only required options
@@ -115,7 +115,7 @@
           - nrg_result.msg is defined  
           - nrg_result.rc == 0 
           #- sql_result.row | length == sql_org_result.row | length
-          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length == 0
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', ifc_ip) | map(attribute='SOURCE_ADDRESS') | list | length == 0
 
     - name: TC03 query the nrg link info to verify the link has been created
       ibmi_sql_query:
@@ -150,7 +150,7 @@
           - nrg_result.msg is defined  
           - nrg_result.rc == 0 
           - (sql_org_result.row | length == 0 and sql_result.row[0]['LOAD_BALANCE_LINK_COUNT'] | int == 1) or sql_result.row[0]['LOAD_BALANCE_LINK_COUNT'] == sql_org_result.row[0]['LOAD_BALANCE_LINK_COUNT']
-          - nrg_link_info_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length >= 1
+          - nrg_link_info_result.row | selectattr('SOURCE_ADDRESS', 'equalto', ifc_ip) | map(attribute='SOURCE_ADDRESS') | list | length >= 1
 
     - name: TC03 assert the nrg link properties
       assert:
@@ -160,7 +160,7 @@
           - item['ADDRESS_SPACE_TYPE'] == 'IPV4'
           - item['LINK_STATE'] == 'DOWN'
           - item['NRG_NAME'] == 'MIRROR_DATABASE'  
-      when: item['SOURCE_ADDRESS'] == '{{ifc_ip}}'
+      when: item['SOURCE_ADDRESS'] == ifc_ip
       loop: "{{nrg_link_info_result['row']}}"
 
     - name: TC04 remove nrg link with all supported options
@@ -186,7 +186,7 @@
           - nrg_result.msg is defined  
           - nrg_result.rc == 0 
           #- sql_result.row | length == sql_org_result.row | length
-          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', '{{ifc_ip}}') | map(attribute='SOURCE_ADDRESS') | list | length == 0
+          - sql_result.row | selectattr('SOURCE_ADDRESS', 'equalto', ifc_ip) | map(attribute='SOURCE_ADDRESS') | list | length == 0
 
     - name: TC05 add nrg link with all supported option
       ibmi_nrg_link:
@@ -204,7 +204,7 @@
         source_address: '*ALL'
       register: nrg_result
     
-    - include: negative_case.yml
+    - ansible.builtin.include_tasks: negative_case.yml
 
   when: "ansible_distribution_version == '7' and ansible_distribution_release == '4'"
 
@@ -214,7 +214,7 @@
         sql: "SELECT INTERNET_ADDRESS,INTERFACE_STATUS,ALIAS_NAME from QSYS2.NETSTAT_INTERFACE_INFO WHERE INTERNET_ADDRESS='{{ifc_ip}}' or ALIAS_NAME='{{ifc_name}}'"
       register: ifc_info
 
-    - include: cleanup.yml
+    - ansible.builtin.include_tasks: cleanup.yml
       loop: '{{ifc_info.row}}'
       when: ifc_info.row | length > 0
 

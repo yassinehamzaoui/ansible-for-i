@@ -1,12 +1,12 @@
-- include: rmvptf.yml
+- ansible.builtin.include_tasks: rmvptf.yml
   when: item.key != '5770999' or item.key != '5770SS1' 
   with_dict: "{{base_ptf_info}}"
 
-- include: rmvptf.yml
+- ansible.builtin.include_tasks: rmvptf.yml
   with_dict: "{{dict_5770SS1}}"
   when: has_5770SS1_ptf == true
 
-- include: rmvptf.yml
+- ansible.builtin.include_tasks: rmvptf.yml
   with_dict: "{{dict_5770999}}"
   when: has_5770999_ptf == true
 

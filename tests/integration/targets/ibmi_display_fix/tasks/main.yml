@@ -25,12 +25,12 @@
         cmd: 'CRTLIB LIB({{remote_lib}})'
 
     - name: transfer save files to remote, load fix and display fix
-      include: display_fix_with_pre.yml
+      ansible.builtin.include_tasks: display_fix_with_pre.yml
       with_items: 
         - '{{pre_ptf.keys() | list}}'      
 
     - name: transfer save files to remote, load fix and display fix
-      include: display_fix_with_dist.yml
+      ansible.builtin.include_tasks: display_fix_with_dist.yml
       with_items: 
         - '{{dist_ptf.keys() | list}}'    
 

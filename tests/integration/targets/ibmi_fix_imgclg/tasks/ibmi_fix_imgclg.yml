@@ -8,7 +8,7 @@
 
 - block:
 
-  - include: remove_ptf.yml
+  - ansible.builtin.include_tasks: remove_ptf.yml
 
   - name: install fix with ptf in the image
     ibmi_fix_imgclg:
@@ -43,7 +43,7 @@
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
-  - include: remove_ptf.yml
+  - ansible.builtin.include_tasks: remove_ptf.yml
 
   - name: install fix with ptf in the image
     ibmi_fix_imgclg:
@@ -66,7 +66,7 @@
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0]['PTF_LOADED_STATUS'] != 'APPLIED' or ptf_status.row[0]['PTF_LOADED_STATUS'] != 'LOADED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
 
-  - include: remove_ptf.yml
+  - ansible.builtin.include_tasks: remove_ptf.yml
 
   - name: Query the ptf status
     ibmi_sql_query:
@@ -124,4 +124,4 @@
     failed_when: "ptf_status.row | length != 1 and (ptf_status.row[0].PTF_LOADED_STATUS != 'APPLIED')"
     loop: "{{(base_ptf_info.values() | join(' ')).split(' ')}}"
   
-  - include: remove_ptf.yml
+  - ansible.builtin.include_tasks: remove_ptf.yml

@@ -17,15 +17,41 @@
 - block:
   - set_fact:
       superuser: "{{ansible_ssh_user}}"
-      nodeA: "9.5.161.179" #ENU 7.4
-      nodeB: "9.5.162.33" #FRA 7.3
-      nodeC: "9.5.161.236" #JPN 7.2
+      nodeA: "9.5.162.123" # ut2026p8.rch.stglabs.ibm.com
+      nodeB: "9.5.71.132" # ut23p84.rch.stglabs.ibm.com
+      nodeC: "9.5.71.107" # ut23p79.rch.stglabs.ibm.com
       cuser: "CUSER" # common user with *USER authority, prepared on nodeC for permission test
+
+  - name: Add VM to Ansible in-memory inventory
+    add_host:
+      name: "{{nodeA}}"
+      groups: remote_ibmi
+      ansible_user: tester
+      ansible_ssh_pass: passw0rd
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
+  - name: Add VM to Ansible in-memory inventory
+    add_host:
+      name: "{{nodeB}}"
+      groups: remote_ibmi
+      ansible_user: tester
+      ansible_ssh_pass: passw0rd
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
+
+  - name: Add VM to Ansible in-memory inventory
+    add_host:
+      name: "{{nodeC}}"
+      groups: remote_ibmi
+      ansible_user: tester
+      ansible_ssh_pass: passw0rd
+      ansible_ssh_extra_args: -o StrictHostKeyChecking=no
+      ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
   - name: TC00 - install paramiko on os400 node A and B if not exists
     command:
       cmd: /QOpenSys/pkgs/bin/yum install python3-paramiko -y
-      warn: no
     delegate_to: "{{item}}"
     delegate_facts: true
     with_items:
@@ -36,7 +62,7 @@
     failed_when: install_paramiko.rc != 0
 
   - name: TC00 - test preparation
-    include: test.yml
+    ansible.builtin.include_tasks: test.yml
     vars:
       target_system: "{{ item }}"
     with_items:

@@ -36,9 +36,9 @@
     UserId: "{{user_result.result_set[0]['USER_ID_NUMBER']}}"
     Size:  "{{user_result.result_set[0]['SIZE']}}"
 
-- include: positive_case.yml
-- include: negative_case.yml
-- include: become_case.yml
+- ansible.builtin.include_tasks: positive_case.yml
+- ansible.builtin.include_tasks: negative_case.yml
+- ansible.builtin.include_tasks: become_case.yml
 
 - name: clean environment
   ibmi_cl_command:

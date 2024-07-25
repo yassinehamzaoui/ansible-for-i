@@ -7,4 +7,4 @@
   tasks:
     # positive cases is covered in role_check_ptf_group, only run negative testcase here. 
     # negative cases
-    - include: neg_case.yml
+    - ansible.builtin.include_tasks: neg_case.yml

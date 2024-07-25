@@ -28,7 +28,7 @@
       - find_result.delta is defined
       - find_result.stderr is defined
       - find_result.message_info | length == 1
-      - find_result.message_info[0]['MESSAGE_TEXT'] == "{{info_msg_text[0]}}"
+      - find_result.message_info[0]['MESSAGE_TEXT'] == info_msg_text[0]
       - find_result.message_info[0]['MESSAGE_TYPE'] == 'INFORMATIONAL'
 
 # Low priority issue, may enhance in future

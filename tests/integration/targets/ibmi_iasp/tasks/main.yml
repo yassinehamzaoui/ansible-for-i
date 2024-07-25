@@ -26,13 +26,13 @@
     - name: assert the returned parameters
       assert:
         that: 
-          - "{{disk_result['disks'].split(' ') | length }} >= 4" 
+          - disk_result['disks'].split(' ') | length >= 4
         fail_msg: "The IBM i doesn't have enough non-configured disks. It doesn't qualify for the testing."
 
-    - include: primary.yml
-    - include: secondary.yml
-    - include: udfs.yml
-    - include: negative_case.yml
+    - ansible.builtin.include_tasks: primary.yml
+    - ansible.builtin.include_tasks: secondary.yml
+    - ansible.builtin.include_tasks: udfs.yml
+    - ansible.builtin.include_tasks: negative_case.yml
 
   always:
 

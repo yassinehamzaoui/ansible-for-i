@@ -15,4 +15,4 @@
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3  
 
     # positive cases is covered in role_check_ptf_group, only run negative testcase here.     
-    - include: neg_case.yml
+    - ansible.builtin.include_tasks: neg_case.yml

@@ -74,7 +74,7 @@ FROM TABLE(QSYS2.ACTIVE_JOB_INFO(
 - name: QSQSRVR_TC03 verify the job i is not owned by the become user even the previous QSQSRVR job owned by becomeuser is still running
   assert:
     that:
-      - authority_result.object_authority_list[0].OWNER == '{{ansible_ssh_user.upper()}}'
+      - authority_result.object_authority_list[0].OWNER == ansible_ssh_user.upper()
 
 - name: Check sync status
   async_status:

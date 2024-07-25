@@ -58,7 +58,7 @@
         ansible_ssh_extra_args: -o StrictHostKeyChecking=no
         ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
-    - include: cleanup.yml 
+    - ansible.builtin.include_tasks: cleanup.yml 
 
     - name: Delete ptf_group entry in fix repo if it already exists
       ibmi_fix_repo:
@@ -66,7 +66,7 @@
         action: "delete"
         type: 'ptf_group'
         parameters:
-        - { 'ptf_group_number' : '{{ group_name }}' }
+        - { 'ptf_group_number': '{{ group_name }}' }
       delegate_to: "repo_server_name"
 
     # At that moment, the repo doesn't have the ptf group and IBM i nodes don't have it.
@@ -437,4 +437,4 @@
   collections:
     - ibm.power_ibmi
   tasks:    
-    - include: neg_case.yml
+    - ansible.builtin.include_tasks: neg_case.yml

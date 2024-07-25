@@ -23,7 +23,7 @@
       assert: 
         that:
           - user_result.result_set | length == 1
-          - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{new_group[0].upper()}}'
+          - user_result.result_set[0]['AUTHORIZATION_NAME'] == new_group[0].upper()
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'NO'
           - user_result.result_set[0]['STATUS'] == '*ENABLED'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*USER'
@@ -72,12 +72,12 @@
       assert: 
         that:
           - user_result.result_set | length == 1
-          - user_result.result_set[0]['AUTHORIZATION_NAME'] == '{{new_user[0].upper()}}'
+          - user_result.result_set[0]['AUTHORIZATION_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'YES'
           - user_result.result_set[0]['STATUS'] == '*DISABLED'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
           - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT     '
-          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[0].upper()}}'
+          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == new_group[0].upper()
           - user_result.result_set[0]['OWNER'] == '*GRPPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'ANSIBLE TESTING'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
@@ -97,8 +97,8 @@
           - user_result.stdout_lines is not defined
           - user_result.stderr_lines is not defined 
           - user_result.result_set | length == 1
-          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[0].upper()}}'
-          - user_result.result_set[0]['USER_PROFILE_NAME'] == '{{new_user[0].upper()}}'
+          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == new_group[0].upper()
+          - user_result.result_set[0]['USER_PROFILE_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['USER_TEXT'] == 'ANSIBLE TESTING'
 
     - name: TC09 create a user profile with all supported options
@@ -131,7 +131,7 @@
           - user_result.result_set[0]['STATUS'] == '*DISABLED'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SYSOPR'
           - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *AUDIT     '
-          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[0].upper()}}'
+          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == new_group[0].upper()
           - user_result.result_set[0]['OWNER'] == '*GRPPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'CHANGED BY ANSIBLE'
 
@@ -156,6 +156,10 @@
         user: '{{new_user[0]}}'
       register: user_result
 
+    - name: TC13 set facts
+      set_fact:
+        home_dir_path: "/HOME/{{new_user[0].upper()}}"
+
     - name: TC13 assert return options
       assert: 
         that:
@@ -163,11 +167,11 @@
           - user_result.result_set[0]['SET_PASSWORD_TO_EXPIRE'] == 'NO'
           - user_result.result_set[0]['STATUS'] == '*ENABLED'
           - user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *SECADM    *SPLCTL    *SERVICE   *IOSYSCFG' or user_result.result_set[0]['SPECIAL_AUTHORITIES'] == '*ALLOBJ    *SECADM    *SPLCTL    *SERVICE   *IOSYSCFG  ' 
-          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[1].upper()}}'
+          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == new_group[1].upper()
           - user_result.result_set[0]['OWNER'] == '*USRPRF'
           - user_result.result_set[0]['TEXT_DESCRIPTION'] == 'ANSIBLE TESTING'
           - user_result.result_set[0]['USER_CLASS_NAME'] == '*SECOFR'
-          - user_result.result_set[0]['HOME_DIRECTORY'] == '/HOME/{{new_user[0].upper()}}'
+          - user_result.result_set[0]['HOME_DIRECTORY'] == home_dir_path
 
     - name: TC14 display the cerated user profile to ensure no member belong to the profile.
       ibmi_user_and_group:
@@ -194,8 +198,8 @@
           - user_result.stdout_lines is not defined
           - user_result.stderr_lines is not defined 
           - user_result.result_set | length == 1
-          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == '{{new_group[1].upper()}}'
-          - user_result.result_set[0]['USER_PROFILE_NAME'] == '{{new_user[0].upper()}}'
+          - user_result.result_set[0]['GROUP_PROFILE_NAME'] == new_group[1].upper()
+          - user_result.result_set[0]['USER_PROFILE_NAME'] == new_user[0].upper()
           - user_result.result_set[0]['USER_TEXT'] == 'ANSIBLE TESTING'
 
     - name: TC16 delete a user profile
@@ -213,12 +217,16 @@
           - user_result.stderr_lines is not defined 
           - user_result.result_set is not defined
 
+    - name: TC17 set facts
+      set_fact:
+        fail_msg: "User {{new_group[0]}} not found"
+
     - name: TC17 display the created user profile
       ibmi_user_and_group:
         operation: 'display'
         user: '{{new_group[0]}}'
       register: user_result
-      failed_when: "'User {{new_group[0]}} not found' not in user_result.msg"
+      failed_when: fail_msg not in user_result.msg
 
     - name: TC18 delete a group which has a user member
       ibmi_user_and_group:

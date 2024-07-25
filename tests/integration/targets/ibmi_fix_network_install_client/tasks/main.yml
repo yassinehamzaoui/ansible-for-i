@@ -33,7 +33,7 @@
       ansible_python_interpreter: /QOpensys/pkgs/bin/python3
 
   - name: run test
-    include: test.yml
+    ansible.builtin.import_tasks: test.yml
     delegate_to: 'cclient'  
 
   - name: revert

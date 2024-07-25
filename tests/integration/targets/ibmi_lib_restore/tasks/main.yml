@@ -18,7 +18,7 @@
     - name: copy file to library
       command: 'mv /tmp/IBMISAVF.FILE /QSYS.LIB/ARCHLIB.LIB/'
     
-    - include: restore_lib.yml
+    - ansible.builtin.include_tasks: restore_lib.yml
 
   always:
     - name: remove copied file

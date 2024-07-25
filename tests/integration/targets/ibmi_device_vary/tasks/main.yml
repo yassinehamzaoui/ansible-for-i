@@ -23,6 +23,10 @@
         status: '*ON'
       register: vary_result
 
+    - name: TC01 set facts
+      set_fact:
+        vary_cmd: "VRYCFG CFGOBJ({{device_name[0]}}) CFGTYPE(*DEV) STATUS(*ON)"
+
     - name: TC01 assert the defined parameters are returned
       assert:
         that:
@@ -31,7 +35,7 @@
           - vary_result.end is defined
           - vary_result.delta is defined
           - vary_result.stdout is defined
-          - "'VRYCFG CFGOBJ({{device_name[0]}}) CFGTYPE(*DEV) STATUS(*ON)' in vary_result.cmd"
+          - vary_cmd in vary_result.cmd
           - vary_result.rc == 0
           - vary_result.stdout_lines is defined
           - vary_result.stderr_lines is defined
@@ -51,10 +55,14 @@
         cmd: QSYS/WRKCFGSTS CFGTYPE(*DEV) CFGD(*ALL) STATUS(*ACTIVE)
       register: cfg_result
 
+    - name: TC02 set facts
+      set_fact: 
+        device_name_cmd: " {{device_name[0]}}               *DEV"
+
     - name: TC02 assert the device has been varied on
       assert:
         that:
-          - "' {{device_name[0]}}               *DEV' in cfg_result.stdout"
+          - device_name_cmd in cfg_result.stdout
 
     - name: TC03 vry on device again
       ibmi_device_vary:

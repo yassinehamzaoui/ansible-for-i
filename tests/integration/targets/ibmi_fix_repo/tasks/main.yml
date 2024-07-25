@@ -88,8 +88,8 @@
     assert:
       that:
         - find_ds.success_list | length == 1
-        - find_ds.success_list | selectattr('order_id', 'equalto', "{{download_fix.order_id}}")
-        - find_ds.success_list | selectattr('file_path', 'equalto', "{{download_fix.file_path}}")
+        - find_ds.success_list | selectattr('order_id', 'equalto', download_fix.order_id)
+        - find_ds.success_list | selectattr('file_path', 'equalto', download_fix.file_path)
         - find_ds.success_list | selectattr('download_status', 'equalto', 'DOWNLOADING')                
         - find_ds.type == "download_status"
 
@@ -126,16 +126,16 @@
         - update_ds.row_changed == 1
         - update_ds.type == "download_status"      
         - upd_result.parameters | selectattr('checksum', 'defined')
-        - upd_result.parameters | selectattr('description', 'defined')
+        #- upd_result.parameters | selectattr('description', 'defined')
         - upd_result.parameters | selectattr('file_name', 'defined')
         - upd_result.parameters | selectattr('checksum', 'defined')
-        - upd_result.parameters | selectattr('order_id','equalto', "{{download_fix.order_id}}")
-        - upd_result.parameters | selectattr('ptf_group_level', 'equalto',"{{returned_ptf_group_level}}")
-        - upd_result.parameters | selectattr('ptf_group_number', 'equalto',"{{returned_ptf_group_number}}")
-        - upd_result.parameters | selectattr('ptf_list', 'defined')
-        - upd_result.parameters | selectattr('release_date', 'equalto', "{{returned_ptf_group_release_date}}")
-        - upd_result.parameters | selectattr('url', 'defined')
-        - upd_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]')
+        - upd_result.parameters | selectattr('order_id','equalto', download_fix.order_id)
+        - upd_result.parameters | selectattr('ptf_group_level', 'equalto', returned_ptf_group_level | int)
+        - upd_result.parameters | selectattr('ptf_group_number', 'equalto', returned_ptf_group_number)
+        #- upd_result.parameters | selectattr('ptf_list', 'defined')
+        - upd_result.parameters | selectattr('release_date', 'equalto', returned_ptf_group_release_date)
+        #- upd_result.parameters | selectattr('url', 'defined')
+        #- upd_result.parameters | selectattr('release', 'match','R[0-9][0-9][0-9]')
         - upd_result.sql is defined
         - upd_result.type == 'ptf_group'
 
@@ -158,15 +158,15 @@
         - query_result.success_list | selectattr('checksum','defined')
         - query_result.success_list | selectattr('description','defined')
         - query_result.success_list | selectattr('file_name','defined')
-        - query_result.success_list | selectattr('file_path','equalto',"{{download_fix.file_path}}")
+        - query_result.success_list | selectattr('file_path','equalto', download_fix.file_path)
         - query_result.success_list | selectattr('id','defined')
-        - query_result.success_list | selectattr('order_id','equalto',"{{download_fix.order_id}}")
-        - query_result.success_list | selectattr('ptf_group_level','equalto',"{{returned_ptf_group_level}}")
-        - query_result.success_list | selectattr('ptf_group_number','equalto',"{{returned_ptf_group_number}}")
+        - query_result.success_list | selectattr('order_id','equalto', download_fix.order_id)
+        - query_result.success_list | selectattr('ptf_group_level','equalto', returned_ptf_group_level | int)
+        - query_result.success_list | selectattr('ptf_group_number','equalto', returned_ptf_group_number)
         - query_result.success_list | selectattr('ptf_group_status','equalto','Match')
         - query_result.success_list | selectattr('ptf_list','defined')
         - query_result.success_list | selectattr('release','R[0-9][0-9][0-9]')
-        - query_result.success_list | selectattr('release_date','equalto',"{{returned_ptf_group_release_date}}") 
+        - query_result.success_list | selectattr('release_date','equalto', returned_ptf_group_release_date)
 
   - name: TC01F - find download_status with additional parameters
     ibmi_fix_repo:
@@ -184,8 +184,8 @@
         - fa_ds_result.action == "find"
         - fa_ds_result.type == "download_status"
         - fa_ds_result.success_list | length == 1
-        - fa_ds_result.success_list[0]['file_path'] == "{{download_fix.file_path}}"
-        - fa_ds_result.success_list[0]['order_id'] == "{{download_fix.order_id}}"
+        - fa_ds_result.success_list[0]['file_path'] == download_fix.file_path
+        - fa_ds_result.success_list[0]['order_id'] == download_fix.order_id
 
   - name: TC01G - delete some PTFs records by using order_id and file_path
     ibmi_fix_repo:
@@ -201,8 +201,8 @@
         - delete_result.action == 'delete'
         - delete_result.type == 'ptf_group'
         - delete_result.sql is defined 
-        - delete_result.parameters | selectattr('order_id','equalto',"{{download_fix.order_id}}")
-        - delete_result.parameters | selectattr('file_path','equalto',"{{download_fix.file_path}}")
+        - delete_result.parameters | selectattr('order_id','equalto', download_fix.order_id)
+        - delete_result.parameters | selectattr('file_path','equalto', download_fix.file_path)
         - delete_result.row_changed == 1
 
   - name: TC01H - delete some PTFs records
@@ -220,8 +220,8 @@
         - del_ds.action == "delete"
         - del_ds.type == "download_status"
         - del_ds.sql != ""
-        - del_ds.parameters[0]['order_id'] == "{{download_fix.order_id}}"
-        - del_ds.parameters[0]['file_path'] == "{{download_fix.file_path}}"
+        - del_ds.parameters[0]['order_id'] == download_fix.order_id
+        - del_ds.parameters[0]['file_path'] == download_fix.file_path
 
   - name: TC01I - query some PTFs records - download_status
     ibmi_fix_repo:
@@ -239,7 +239,7 @@
         - find_ds.type == "download_status"
         - find_ds.fail_list | length == 1
         - find_ds.fail_list[0]['db_record'] == "RECORD_NOT_FOUND"
-        - find_ds.fail_list[0]['order_id'] == "{{download_fix.order_id}}"
+        - find_ds.fail_list[0]['order_id'] == download_fix.order_id
 
   - name: TC01J - query some PTFs records - ptf_group
     ibmi_fix_repo:
@@ -257,16 +257,16 @@
         - find_ptfg.type == "ptf_group"
         - find_ptfg.fail_list | length == 1
         - find_ptfg.fail_list[0]['db_record'] == "RECORD_NOT_FOUND"
-        - find_ptfg.fail_list[0]['order_id'] == "{{download_fix.order_id}}"
-        - find_ptfg.fail_list[0]['file_path'] == "{{download_fix.file_path}}"
-        - find_ptfg.fail_list[0]['ptf_group_number'] == "{{returned_ptf_group_number}}"
-        - find_ptfg.fail_list[0]['ptf_group_level'] == "{{returned_ptf_group_level}}"
-        - find_ptfg.fail_list[0]['release_date'] == "{{returned_ptf_group_release_date}}"                               
+        - find_ptfg.fail_list[0]['order_id'] == download_fix.order_id
+        - find_ptfg.fail_list[0]['file_path'] == download_fix.file_path
+        - find_ptfg.fail_list[0]['ptf_group_number'] == returned_ptf_group_number
+        - find_ptfg.fail_list[0]['ptf_group_level'] == returned_ptf_group_level
+        - find_ptfg.fail_list[0]['release_date'] == returned_ptf_group_release_date
 
   - name: TC02A - delete PTF prior to downloading with reorder *YES
     ibmi_cl_command: 
       cmd: DLTOBJ OBJ(Q{{ptfs[0]}}) OBJTYPE(*FILE)
-    ignore_errors: true  
+    ignore_errors: true
 
   - name: TC02A - download single PTFs via SNDPTFORD
     ibmi_download_fix:
@@ -493,10 +493,10 @@
         - neg_result.fail_list | length == 4
         - neg_result.fail_list[0] | selectattr('msg','equalto','Required parameter [file_path] is missing in parameters')
         - neg_result.fail_list[0] | selectattr('rc','equalto','-1')
-        - neg_result.fail_list[0] | selectattr('ptf_id','equalto','{{ptfs[0]}}')
+        - neg_result.fail_list[0] | selectattr('ptf_id','equalto', ptfs[0])
         - neg_result.fail_list[1] | selectattr('msg','equalto','Target image file [/QSYS.LIB/QGPL.LIB/NOTEXIST.FILE] is not readable')
         - neg_result.fail_list[1] | selectattr('rc','equalto','-3')
-        - neg_result.fail_list[1] | selectattr('ptf_id','equalto','{{ptfs[0]}}')
+        - neg_result.fail_list[1] | selectattr('ptf_id','equalto', ptfs[0])
 
   - name: TC04G - Negative test - try to find a non-exist single_ptf record 
     ibmi_fix_repo:

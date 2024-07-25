@@ -1,5 +1,11 @@
 ### REQUIRED
 
+# Galaxy file customized for Redhat collection image generation
+#
+# We have to exclude some collection roles and use cases that utilize PowerVC and rely on an uncertified collection,
+# openstack.cloud, because this is not allowed by Redhat with the certified parent collection. Unfortunately, there
+# currently is not a certified collection that provides the functionality of openstack.cloud.
+
 # The namespace of the collection. This can be a company/brand/organization or product namespace under which all
 # content lives. May only contain alphanumeric characters and underscores. Additionally namespaces cannot start with
 # underscores or numbers and cannot contain consecutive underscores
@@ -9,7 +15,7 @@ namespace: ibm
 name: power_ibmi
 
 # The version of the collection. Must be compatible with semantic versioning
-version: 3.0.0
+version: 3.1.0
 
 # The path to the Markdown (.md) readme file. This path is relative to the root of the collection
 readme: README.md
@@ -68,9 +74,10 @@ issues: https://github.com/IBM/ansible-for-i/issues
 # A list of file glob-like patterns used to filter any files or directories that should not be included in the build
 # artifact. A pattern is matched from the relative path of the file or directory of the collection directory. This
 # uses 'fnmatch' to match the files or directories. Some directories and files like 'galaxy.yml', '*.pyc', '*.retry',
-# and '.git' are always filtered
+# and '.git' are always filtered.
 build_ignore:
   - ansible.cfg
+  - ansible_source.patch
   - .gitignore
   - .travis.yml
   - .script
@@ -81,3 +88,8 @@ build_ignore:
   - tests/sanity
   - plugins/modules/ibmi_powervc_os_server_capture.py
   - changelogs/.plugin-cache.yaml
+# Exclude unnecessary RH files or temporary files for dual Ansible Galaxy and Redhat AAP build
+  - requirements-RH.yml
+  - requirements.yml.ORG
+  - galaxy-RH.yml
+  - galaxy.yml.ORG

@@ -11,10 +11,14 @@
     backup: false
   register: copy_result
 
+- name: TC01 set facts 
+  set_fact: 
+    copy_result_path: "/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}"
+
 - name: TC01 assert the returned parameters
   assert:
     that:
-      - "copy_result.dest == '/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}'"
+      - copy_result.dest == copy_result_path
       - copy_result.msg is defined
       - copy_result.stderr is defined
       - copy_result.stdout is defined
@@ -43,10 +47,14 @@
     src: '{{ savf_name }}'
     lib_name: '{{remote_temp_lib}}'
 
+- name: TC02 set facts
+  set_fact:
+    copy_result_path = "/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}"
+
 - name: TC02 assert the returned parameters
   assert:
     that:
-      - "copy_result.dest == '/QSYS.LIB/{{remote_temp_lib}}.LIB/{{ savf_name}}'"
+      - copy_result.dest == copy_result_path
       - copy_result.msg is defined
       - copy_result.stderr is defined
       - copy_result.stdout is defined

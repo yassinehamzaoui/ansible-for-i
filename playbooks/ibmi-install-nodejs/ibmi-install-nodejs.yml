@@ -37,10 +37,7 @@
       failed_when: false
 
     - name: Set http.sslVerify for git
-      community.general.git_config:
-        name: http.sslVerify
-        scope: global
-        value: false
+      ansible.builtin.command: git config --global http.sslVerify false    # noqa: command-instead-of-module
       changed_when: true
       failed_when: false
 

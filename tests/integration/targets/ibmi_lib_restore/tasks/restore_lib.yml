@@ -12,7 +12,7 @@
     savefile_name: 'SAVTEST'
     savefile_lib: 'ARCHLIB'
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC02 restore library with only required options
   ibmi_lib_restore:
@@ -35,7 +35,7 @@
       - rstlib_result.savefile_lib == 'ARCHLIB'
       - rstlib_result.format == '*SAVF'
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC03 restore lib with all supported options
   ibmi_lib_restore:
@@ -47,7 +47,7 @@
     parameters: ''
   register: rstlib_result
 
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC04 restore library with parameters
   ibmi_lib_restore:
@@ -63,7 +63,7 @@
     expected_row_count: 6
 
 # Test negitive path
-- include: dlt_crt_lib.yml
+- ansible.builtin.include_tasks: dlt_crt_lib.yml
 
 - name: TC05 restore lib with not existing library
   ibmi_lib_restore:

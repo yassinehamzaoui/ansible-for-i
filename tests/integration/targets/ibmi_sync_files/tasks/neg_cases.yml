@@ -40,15 +40,20 @@
     register: result_04
     failed_when: result_04.rc != 255
 
+  - name: TC04 - Set facts for assertion comparison
+    set_fact:
+      src_file_path: "/home/{{ansible_ssh_user}}/sendMsg1.c"
+      dest_path: "/home/{{ansible_ssh_user}}/"
+
   - name: TC04 - Assert return values
     assert:
       that:
         - result_04.success_list == []
         - '"No files were successfully transferred." in result_04.msg'
         - result_04.fail_list | length == 1
-        - result_04.fail_list[0]['src'] == "/home/{{ansible_ssh_user}}/sendMsg1.c"
+        - result_04.fail_list[0]['src'] == src_file_path
         - "'[Errno 2] No such file or directory' in result_04.fail_list[0]['fail_reason']"
-        - result_04.fail_list[0]['dest'] == "/home/{{ansible_ssh_user}}/"
+        - result_04.fail_list[0]['dest'] == dest_path
 
   - name: TC05 - switch to a common user to do sync
     set_fact:

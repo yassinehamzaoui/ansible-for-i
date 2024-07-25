@@ -8,6 +8,6 @@
     pwd: 'ansipwd'
     new_group: [ANGRP1, angrp2]
 
-- include: display.yml
-- include: user_and_group.yml
-- include: negative_case.yml
+- ansible.builtin.include_tasks: display.yml
+- ansible.builtin.include_tasks: user_and_group.yml
+- ansible.builtin.include_tasks: negative_case.yml

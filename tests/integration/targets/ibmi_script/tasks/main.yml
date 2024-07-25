@@ -11,6 +11,6 @@
 - set_fact:
     file_path: '{{ tempfile_result.stdout }}/targets/ibmi_script/files'
 
-- include: cl.yml
-- include: sql.yml
-- include: iasp.yml
+- ansible.builtin.include_tasks: cl.yml
+- ansible.builtin.include_tasks: sql.yml
+- ansible.builtin.include_tasks: iasp.yml

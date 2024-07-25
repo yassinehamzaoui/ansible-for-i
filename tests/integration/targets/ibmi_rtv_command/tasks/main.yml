@@ -4,8 +4,8 @@
 # GNU General Public License v3 or later (see COPYING or https://www.gnu.org/licenses/gpl-3.0.txt )
 #
 
-- include: RTVAUTLE.yml
-- include: RTVNETA.yml
+- ansible.builtin.include_tasks: RTVAUTLE.yml
+- ansible.builtin.include_tasks: RTVNETA.yml
 
 - name: Unsupported case
   ibmi_rtv_command:

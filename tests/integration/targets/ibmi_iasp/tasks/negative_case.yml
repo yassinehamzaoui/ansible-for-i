@@ -144,7 +144,7 @@
   register: iasp_result
   ignore_errors: true
 
-- name:
+- name: Assertion for invalid primary asp options
   assert:
     that:
       #- "'Device description ABC not correct for operation' in iasp_result.stderr"
