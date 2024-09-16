@@ -244,6 +244,3 @@
       ansible.builtin.debug:
         var: fix_repo_download_apply_individual_ptfs_requisite_ptfs_status
       when: fix_repo_download_apply_individual_ptfs_requisite_ptfs_status is defined
-
-    - name: End host (end_host)
-      ansible.builtin.meta: end_host
